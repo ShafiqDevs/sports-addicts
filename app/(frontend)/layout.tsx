@@ -8,6 +8,7 @@ import {
 import { AppSidebar } from '@/components/ui/app-sidebar';
 import SearchBar from '@/components/SearchBar';
 
+
 const geistSans = Geist({
 	variable: '--font-geist-sans',
 	subsets: ['latin'],
@@ -34,9 +35,11 @@ export default function RootLayout({
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 				<SidebarProvider>
 					<AppSidebar />
+
 					<div className='w-full'>
-						<div className='sticky top-0 grid grid-cols-3 bg-card py-4'>
+						<div className='sticky top-0 flex flex-row justify-end items-center bg-card py-4'>
 							<SidebarTrigger />
+							next game on: 31 Dec at 7:00
 							<SearchBar />
 						</div>
 						{children}
