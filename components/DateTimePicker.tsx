@@ -17,7 +17,7 @@ import {
 	CardTitle,
 } from '@/components/ui/card';
 
-export default function BookingCalendar() {
+export default function DateTimePicker() {
 	const [selectedDateTime, setSelectedDateTime] = useState<Date>(
 		new Date()
 	);
