@@ -13,13 +13,13 @@ export default defineSchema({
 		capacity: v.number(),
 		address: v.string(),
 		images: v.array(v.string()),
+		description: v.string(),
 	}),
 	bookings: defineTable({
 		hostingUser_id: v.id('users'),
 		pitch_id: v.id('pitches'),
 		booking_start: v.number(), // dates will be in timestamp format
 		booking_end: v.number(), // dates will be in timestamp format
-		time: v.string(),
 		status: v.union(
 			v.literal('Available'),
 			v.literal('Booked'),
@@ -27,5 +27,5 @@ export default defineSchema({
 			v.literal('Completed')
 		), // Available, Booked, Cancelled, Completed
 		// Other fields here...
-	}),
+	}).index('byBookingStart', ['booking_start']),
 });

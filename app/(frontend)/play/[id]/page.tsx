@@ -3,35 +3,64 @@ import { Share, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import DateTimePicker from '@/components/DateTimePicker';
 import FramerCarousell from '@/components/FramerCarousell';
+import { BookingList } from '@/components/BookingList';
+import { convex } from '@/lib/utils';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 
-interface PitchPageProps {
-	params: {
-		id: string;
-	};
-}
+type Props = {
+	params: Promise<{ id: string }>;
+	searchParams: Promise<{
+		query: string;
+	}>;
+};
 
-export default function PitchPage({ params }: PitchPageProps) {
-	// In a real app, fetch pitch data here based on params.id
-	const pitch = {
-		name: 'Champions Arena',
-		capacity: 22,
-		address: 'Football City, FC1 2BA',
-		images: [
-			'https://placehold.co/600x400.png',
-			'https://placehold.co/600x400.png',
-			'https://placehold.co/600x400.png',
-			'https://placehold.co/600x400.png',
-			'https://placehold.co/600x400.png',
-		],
-		rating: 4.87,
-		reviews: 210,
-		host: {
-			name: 'John Smith',
-			image: '/placeholder.svg?height=50&width=50',
-		},
-		description:
-			'Clean, modern football pitch with easy access to city center, great changing rooms, and public transportation. Perfect for matches and training sessions.',
-	};
+export default async function PitchPage({
+	params,
+	searchParams,
+}: Props) {
+	const { id } = await params;
+	const { query } = await searchParams;
+
+	console.log(`query>>>>> ${query}`);
+
+	let searchDate = new Date(parseInt(query)).getTime();
+	if (!query) {
+		searchDate = new Date().getTime();
+	}
+
+	const pitch = await convex.query(api.pitches.getPitchById, {
+		id: id as Id<'pitches'>,
+	});
+	if (!pitch) {
+		// return a UI to indicate to the user that the pitch does not exist.
+		return;
+	}
+	const bookings = await convex.query(api.bookings.getBookingByDate, {
+		booking_start: searchDate,
+	});
+
+	console.log(JSON.stringify(bookings, null, 2));
+
+	// const pitch = {
+	// 	name: 'Champions Arena',
+	// 	capacity: 22,
+	// 	address: 'Football City, FC1 2BA',
+	// 	images: [
+	// 		'https://placehold.co/600x400.png',
+	// 		'https://placehold.co/600x400.png',
+	// 		'https://placehold.co/600x400.png',
+	// 		'https://placehold.co/600x400.png',
+	// 		'https://placehold.co/600x400.png',
+	// 	],
+
+	// 	host: {
+	// 		name: 'John Smith',
+	// 		image: '/placeholder.svg?height=50&width=50',
+	// 	},
+	// 	description:
+	// 		'Clean, modern football pitch with easy access to city center, great changing rooms, and public transportation. Perfect for matches and training sessions.',
+	// };
 
 	return (
 		<main className='max-w-[1280px] mx-auto px-6 pb-12'>
@@ -86,8 +115,8 @@ export default function PitchPage({ params }: PitchPageProps) {
 				/>
 			</div>
 
-			<div className='grid md:grid-cols-[1fr_auto] gap-12 mt-8'>
-				<div className=''>
+			<div className='grid grid-cols-1 md:grid-cols-2 gap-12 mt-8'>
+				<div className='col-span-1'>
 					{/* Basic Info */}
 					<div className='flex justify-between pb-6 border-b '>
 						<div>
@@ -119,10 +148,29 @@ export default function PitchPage({ params }: PitchPageProps) {
 							{pitch.description}
 						</p>
 					</div>
+					<div>
+						<BookingList
+							//TODO: fix the bookingList component
+							bookings={[
+								{
+									booking_start: bookings![0].booking_start,
+									booking_end: bookings![0].booking_end,
+									status: bookings![0].status,
+									hostingUser_id: 'j977gssn3f9ykqwmxj4eprh9w977bkfg',
+									pitch_id: 'jd72tqd83h1pnwrw9banxz8kpd77dvte',
+									id: 'j977gssn3f9ykqwmxj4eprh9w977bkfg',
+									pitch: {
+										name: 'Champions Arena',
+									},
+									user: { name: 'Shafiq' },
+								},
+							]}
+						/>
+					</div>
 				</div>
 
 				{/* Booking Card */}
-				<div className='w-fit h-fit rounded-xl border bg-card p-6'>
+				<div className='col-span-1 h-fit rounded-xl border bg-card p-6'>
 					<div className='flex items-baseline gap-1 mb-6'>
 						<span className='text-2xl font-semibold'>£60</span>
 						<span className='text-muted-foreground'>/hour</span>

@@ -21,7 +21,7 @@ function UserClerkMenu({}: Props) {
 	}, [user, isSignedIn, isLoaded]);
 
 	return (
-		<div>
+		<div className=' flex justify-center items-center w-fit h-fit'>
 			<SignedOut>
 				<Button asChild>
 					<SignInButton />

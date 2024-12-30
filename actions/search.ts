@@ -1,5 +1,5 @@
 'use server';
 
-export async function x() {
+export async function x(formData: FormData) {
 	return;
 }

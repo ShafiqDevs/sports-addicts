@@ -16,6 +16,8 @@ import {
 	UserButton,
 } from '@clerk/nextjs';
 import UserClerkMenu from '@/components/UserClerkMenu';
+import { ThemeProvider } from '@/lib/ThemeProvider';
+import { ThemeSwitch } from '@/components/ThemeSwitch';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -41,27 +43,33 @@ export default function DashboardLayout({
 		<html lang='en'>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-				<ClerkProvider dynamic>
-					<SidebarProvider>
-						<AppSidebar />
-
+				<ThemeProvider
+					attribute={'class'}
+					defaultTheme={'system'}
+					enableSystem
+					disableTransitionOnChange>
+					<ClerkProvider dynamic>
 						<div className='w-full '>
-							<div className='sticky top-0 w-full navBarheight  flex flex-row justify-end items-center bg-card py-4 z-[99] border-b border-border'>
-								<SidebarTrigger />
-								<div className='w-full flex flex-col md:flex-row items-center justify-end gap-8'>
+							<div className='sticky top-0 w-full navBarheight  flex flex-row justify-end items-center bg-card layoutXPadding py-4 z-[99] border-b border-border '>
+								<div className='w-full flex flex-col md:flex-row items-center justify-between gap-8'>
 									<span className='order-last md:order-first'>
 										next game on: 31 Dec at 7:00
 									</span>
 									<div className='flex items-center justify-end gap-8'>
 										<SearchBar />
-										<UserClerkMenu />
+										<div
+											className='flex justify-between items-center
+										 gap-2'>
+											<ThemeSwitch />
+											<UserClerkMenu />
+										</div>
 									</div>
 								</div>
 							</div>
 							{children}
 						</div>
-					</SidebarProvider>
-				</ClerkProvider>
+					</ClerkProvider>
+				</ThemeProvider>
 			</body>
 		</html>
 	);

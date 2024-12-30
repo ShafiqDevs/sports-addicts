@@ -12,7 +12,7 @@ function SearchBar({}: Props) {
 			className='flex flex-col md:flex-row items-center justify-center gap-2'>
 			<div className='flex flex-row justify-between border border-border py-1 pr-2 pl-4 rounded-full w-full md:w-60 '>
 				<input
-					className='outline-none w-full'
+					className='outline-none bg-transparent w-full text-sm'
 					type='text'
 					placeholder='Search for lobbies...'
 				/>

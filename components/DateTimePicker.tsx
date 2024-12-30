@@ -46,7 +46,7 @@ export default function DateTimePicker() {
 				</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<div className='flex flex-col md:flex-row gap-6'>
+				<div className='flex flex-col-reverse md:flex-row flex-wrap-reverse gap-6'>
 					<div className='flex-1'>
 						<Calendar
 							mode='single'
@@ -66,7 +66,7 @@ export default function DateTimePicker() {
 							className='rounded-md border border-input'
 						/>
 					</div>
-					<div className='w-full md:w-48 space-y-4'>
+					<div className='w-full md:w-48 space-y-4 '>
 						<Button
 							onClick={() => handleRangeSelection('today')}
 							variant='outline'
@@ -95,7 +95,6 @@ export default function DateTimePicker() {
 								newDateTime.setHours(hours, minutes, 0, 0);
 								setSelectedDateTime(newDateTime);
 							}}
-                            
 							value={`${selectedDateTime
 								.getHours()
 								.toString()
