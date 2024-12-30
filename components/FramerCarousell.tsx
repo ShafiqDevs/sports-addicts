@@ -25,7 +25,7 @@ function FramerCarousell({ images, imageAltText }: Props) {
 					<motion.img
 						key={currentImageIndex}
 						src={images[currentImageIndex]}
-						alt={`${name} - View ${currentImageIndex + 1}`}
+						alt={`View ${currentImageIndex + 1}`}
 						className='absolute inset-0 w-full h-full object-cover'
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}

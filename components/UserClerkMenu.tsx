@@ -16,7 +16,17 @@ function UserClerkMenu({}: Props) {
 	const { user, isSignedIn, isLoaded } = useUser();
 	useEffect(() => {
 		if (user && isSignedIn) {
-			registerUser(user.id);
+			registerUser(
+				user.id,
+				user.username ||
+					user.firstName ||
+					user.lastName ||
+					user.fullName ||
+					'',
+				user.primaryEmailAddress?.emailAddress ||
+					user.emailAddresses[0].emailAddress,
+				user.imageUrl
+			);
 		}
 	}, [user, isSignedIn, isLoaded]);
 

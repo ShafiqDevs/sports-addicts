@@ -5,6 +5,9 @@ export default defineSchema({
 	// Other tables here...
 	users: defineTable({
 		clerk_id: v.string(),
+		user_name: v.string(),
+		user_email: v.string(),
+		user_profile_image_url: v.string(),
 		// tasks: v.array(v.ref(tasks)),
 		// Other fields here...
 	}).index('byClerkId', ['clerk_id']),

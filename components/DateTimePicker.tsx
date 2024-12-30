@@ -16,10 +16,16 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
+import { useRouter } from 'next/navigation';
 
-export default function DateTimePicker() {
+type Props = {
+	selectedTimeStamp: number;
+};
+
+export default function DateTimePicker({ selectedTimeStamp }: Props) {
+	const router = useRouter();
 	const [selectedDateTime, setSelectedDateTime] = useState<Date>(
-		new Date()
+		new Date(selectedTimeStamp)
 	);
 	const [duration, setDuration] = useState<string>('1');
 
@@ -27,10 +33,19 @@ export default function DateTimePicker() {
 		const now = new Date();
 		if (range === 'today') {
 			setSelectedDateTime(now);
+			const url = new URL(window.location.href);
+			url.searchParams.set('booking_date', now.getTime().toString());
+			router.push(url.toString(), { scroll: false }); // Update URL and rerender on the server
 		} else if (range === 'week') {
 			const endOfWeek = new Date(now);
 			endOfWeek.setDate(now.getDate() + (7 - now.getDay()));
 			setSelectedDateTime(endOfWeek);
+			const url = new URL(window.location.href);
+			url.searchParams.set(
+				'booking_date',
+				endOfWeek.getTime().toString()
+			);
+			router.push(url.toString(), { scroll: false }); // Update URL and rerender on the server
 		}
 	};
 
@@ -49,6 +64,7 @@ export default function DateTimePicker() {
 				<div className='flex flex-col-reverse md:flex-row flex-wrap-reverse gap-6'>
 					<div className='flex-1'>
 						<Calendar
+							className='rounded-md border border-input'
 							mode='single'
 							selected={selectedDateTime}
 							onSelect={(newDate) => {
@@ -61,14 +77,21 @@ export default function DateTimePicker() {
 										0
 									);
 									setSelectedDateTime(newDateTime);
+									const url = new URL(window.location.href);
+									url.searchParams.set(
+										'booking_date',
+										newDateTime.getTime().toString()
+									);
+									router.push(url.toString(), { scroll: false }); // Update URL and rerender on the server
 								}
 							}}
-							className='rounded-md border border-input'
 						/>
 					</div>
 					<div className='w-full md:w-48 space-y-4 '>
 						<Button
-							onClick={() => handleRangeSelection('today')}
+							onClick={() => {
+								handleRangeSelection('today');
+							}}
 							variant='outline'
 							className='w-full justify-start text-left font-normal'>
 							Today

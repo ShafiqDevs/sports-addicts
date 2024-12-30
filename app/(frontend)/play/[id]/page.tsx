@@ -6,12 +6,16 @@ import FramerCarousell from '@/components/FramerCarousell';
 import { BookingList } from '@/components/BookingList';
 import { convex } from '@/lib/utils';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { Doc, Id } from '@/convex/_generated/dataModel';
+import { BookingWithUserData } from '@/lib/types';
+import BookingManager from '@/components/BookingManager';
+import { ROUTES } from '@/lib/routes';
+import { notFound, redirect } from 'next/navigation';
 
 type Props = {
 	params: Promise<{ id: string }>;
 	searchParams: Promise<{
-		query: string;
+		booking_date: string;
 	}>;
 };
 
@@ -19,28 +23,52 @@ export default async function PitchPage({
 	params,
 	searchParams,
 }: Props) {
-	const { id } = await params;
-	const { query } = await searchParams;
+	let id: string;
+	let booking_date: string | number | null;
+	let pitch: Doc<'pitches'> | null;
 
-	console.log(`query>>>>> ${query}`);
+	try {
+		const paramsResult = await params;
+		const searchParamsResult = await searchParams;
 
-	let searchDate = new Date(parseInt(query)).getTime();
-	if (!query) {
-		searchDate = new Date().getTime();
+		id = paramsResult.id;
+		booking_date = searchParamsResult.booking_date || null;
+
+		console.log(`query>>>>> ${booking_date}`);
+
+		if (booking_date)
+			booking_date = new Date(parseInt(booking_date)).getTime();
+		else booking_date = new Date().getTime();
+
+		pitch = await convex.query(api.pitches.getPitchById, {
+			id: id as Id<'pitches'>,
+		});
+		if (!pitch) {
+			// return a UI to indicate to the user that the pitch does not exist.
+			return;
+		}
+	} catch (error) {
+		console.error('Error fetching data:', error);
+		// Handle the error appropriately here
+
+		return <h1>a</h1>;
 	}
+	const bookings: BookingWithUserData[] = await convex.query(
+		api.bookings.getBookingsForPitchByDate,
+		{
+			booking_start: booking_date,
+			pitch_id: id,
+		}
+	);
 
-	const pitch = await convex.query(api.pitches.getPitchById, {
-		id: id as Id<'pitches'>,
-	});
-	if (!pitch) {
-		// return a UI to indicate to the user that the pitch does not exist.
-		return;
-	}
-	const bookings = await convex.query(api.bookings.getBookingByDate, {
-		booking_start: searchDate,
-	});
+	
 
-	console.log(JSON.stringify(bookings, null, 2));
+
+
+	console.log(
+		'Play/[id]/page Bookings>>>',
+		JSON.stringify(bookings, null, 2)
+	);
 
 	// const pitch = {
 	// 	name: 'Champions Arena',
@@ -63,9 +91,9 @@ export default async function PitchPage({
 	// };
 
 	return (
-		<main className='max-w-[1280px] mx-auto px-6 pb-12'>
+		<main className='w-full h-screen layoutXPadding'>
 			{/* Header */}
-			<div className='flex justify-between items-center py-6'>
+			<div className=' bg- flex justify-between items-center py-6'>
 				<h1 className='text-2xl font-medium'>{pitch.name}</h1>
 				<div className='flex gap-4'>
 					<button className='flex items-center gap-2 hover:underline'>
@@ -114,86 +142,18 @@ export default async function PitchPage({
 					]}
 				/>
 			</div>
-
-			<div className='grid grid-cols-1 md:grid-cols-2 gap-12 mt-8'>
-				<div className='col-span-1'>
-					{/* Basic Info */}
-					<div className='flex justify-between pb-6 border-b '>
-						<div>
-							<h2 className='text-xl font-medium'>{`${pitch.capacity / 2}-a-side pitch`}</h2>
-							<p className='text-muted-foreground'>{pitch.address}</p>
-						</div>
-						{/* <div className='flex items-center gap-2'>
-							<Image
-								src={pitch.host.image}
-								alt={pitch.host.name}
-								width={50}
-								height={50}
-								className='rounded-full'
-							/>
-							<div>
-								<p className='font-medium'>
-									Hosted by {pitch.host.name}
-								</p>
-								<p className='text-sm text-muted-foreground'>
-									Superhost
-								</p>
-							</div>
-						</div> */}
-					</div>
-
-					{/* Description */}
-					<div className='py-6 border-b'>
-						<p className='text-muted-foreground leading-relaxed'>
-							{pitch.description}
-						</p>
-					</div>
-					<div>
-						<BookingList
-							//TODO: fix the bookingList component
-							bookings={[
-								{
-									booking_start: bookings![0].booking_start,
-									booking_end: bookings![0].booking_end,
-									status: bookings![0].status,
-									hostingUser_id: 'j977gssn3f9ykqwmxj4eprh9w977bkfg',
-									pitch_id: 'jd72tqd83h1pnwrw9banxz8kpd77dvte',
-									id: 'j977gssn3f9ykqwmxj4eprh9w977bkfg',
-									pitch: {
-										name: 'Champions Arena',
-									},
-									user: { name: 'Shafiq' },
-								},
-							]}
-						/>
-					</div>
-				</div>
-
-				{/* Booking Card */}
-				<div className='col-span-1 h-fit rounded-xl border bg-card p-6'>
-					<div className='flex items-baseline gap-1 mb-6'>
-						<span className='text-2xl font-semibold'>£60</span>
-						<span className='text-muted-foreground'>/hour</span>
-					</div>
-
-					<DateTimePicker />
-
-					<div className='space-y-4 mt-6 pt-6 border-t'>
-						<div className='flex justify-between'>
-							<span>£60 x 2 hours</span>
-							<span>£120</span>
-						</div>
-						<div className='flex justify-between'>
-							<span>Service fee</span>
-							<span>£15</span>
-						</div>
-						<div className='flex justify-between pt-4 border-t font-semibold'>
-							<span>Total</span>
-							<span>£135</span>
-						</div>
-					</div>
-				</div>
-			</div>
+			{/* //TODO: booking component here */}
+			<BookingManager
+				selectedTimeStamp={booking_date}
+				bookings={bookings}
+				pitch={pitch}
+			/>
 		</main>
 	);
 }
+
+const student = {
+	name: 'hahdsf',
+	id: 123,
+	year: 12312,
+};

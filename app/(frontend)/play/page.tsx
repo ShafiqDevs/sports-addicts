@@ -13,9 +13,9 @@ export default async function PlayPage({}: Props) {
 		return <h1>NO PITCHES WHAT?</h1>;
 	}
 	return (
-		<div className='w-full h-screen '>
+		<div className='w-full h-screen layoutXPadding'>
 			<h1>Welcome to Sports Addicts!</h1>
-			<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center gap-4'>
+			<div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 place-items-center gap-4'>
 				{pitches.map(
 					({
 						_id,
