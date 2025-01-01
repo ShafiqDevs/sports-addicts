@@ -5,5 +5,5 @@ export const ROUTES = {
 	},
 	support: `/support`,
 	play: `/play`,
-    
+	bookings: `/bookings`,
 };

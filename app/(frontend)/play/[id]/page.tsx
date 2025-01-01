@@ -9,8 +9,6 @@ import { api } from '@/convex/_generated/api';
 import { Doc, Id } from '@/convex/_generated/dataModel';
 import { BookingWithUserData } from '@/lib/types';
 import BookingManager from '@/components/BookingManager';
-import { ROUTES } from '@/lib/routes';
-import { notFound, redirect } from 'next/navigation';
 
 type Props = {
 	params: Promise<{ id: string }>;
@@ -26,6 +24,7 @@ export default async function PitchPage({
 	let id: string;
 	let booking_date: string | number | null;
 	let pitch: Doc<'pitches'> | null;
+	let pitchImages: string[];
 
 	try {
 		const paramsResult = await params;
@@ -47,6 +46,10 @@ export default async function PitchPage({
 			// return a UI to indicate to the user that the pitch does not exist.
 			return;
 		}
+		pitchImages = await convex.query(api.files.getFiles, {
+			storageIds: pitch.images,
+		});
+		console.log('pitch images>>>', pitchImages);
 	} catch (error) {
 		console.error('Error fetching data:', error);
 		// Handle the error appropriately here
@@ -60,10 +63,6 @@ export default async function PitchPage({
 			pitch_id: id,
 		}
 	);
-
-	
-
-
 
 	console.log(
 		'Play/[id]/page Bookings>>>',
@@ -111,14 +110,14 @@ export default async function PitchPage({
 			<div className='hidden sm:grid grid-cols-4 gap-2 rounded-xl overflow-hidden aspect-[20/9]'>
 				<div className='col-span-2 row-span-2 relative'>
 					<Image
-						src={pitch.images[0]}
+						src={pitchImages[0] || ''}
 						alt={pitch.name}
 						fill
 						className='object-cover'
 						priority
 					/>
 				</div>
-				{pitch.images.slice(1).map((image, i) => (
+				{pitchImages.slice(1).map((image, i) => (
 					<div
 						key={i}
 						className='relative'>
@@ -134,13 +133,7 @@ export default async function PitchPage({
 
 			{/* image carousell on small screens only */}
 			<div className='flex sm:hidden items-center justify-center w-full h-fit'>
-				<FramerCarousell
-					images={[
-						'https://placehold.co/600x400.png',
-						'https://placehold.co/600x400.png',
-						'https://placehold.co/600x400.png',
-					]}
-				/>
+				<FramerCarousell images={pitchImages} />
 			</div>
 			{/* //TODO: booking component here */}
 			<BookingManager

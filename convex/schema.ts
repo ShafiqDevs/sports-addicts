@@ -15,7 +15,7 @@ export default defineSchema({
 		name: v.string(),
 		capacity: v.number(),
 		address: v.string(),
-		images: v.array(v.string()),
+		images: v.array(v.id('_storage')),
 		description: v.string(),
 	}),
 	bookings: defineTable({
@@ -23,6 +23,8 @@ export default defineSchema({
 		pitch_id: v.id('pitches'),
 		booking_start: v.number(), // dates will be in timestamp format
 		booking_end: v.number(), // dates will be in timestamp format
+		teamA: v.array(v.id('users')),
+		teamB: v.array(v.id('users')),
 		status: v.union(
 			v.literal('Available'),
 			v.literal('Booked'),

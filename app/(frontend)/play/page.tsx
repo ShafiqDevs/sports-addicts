@@ -25,48 +25,14 @@ export default async function PlayPage({}: Props) {
 						images,
 						name,
 					}) => (
-						<>
-							<PitchCard
-								_id={_id}
-								key={_id}
-								name={name}
-								images={images}
-								address={address}
-								capacity={capacity}
-							/>
-							<PitchCard
-								_id={_id}
-								key={_id}
-								name={name}
-								images={images}
-								address={address}
-								capacity={capacity}
-							/>
-							<PitchCard
-								_id={_id}
-								key={_id}
-								name={name}
-								images={images}
-								address={address}
-								capacity={capacity}
-							/>
-							<PitchCard
-								_id={_id}
-								key={_id}
-								name={name}
-								images={images}
-								address={address}
-								capacity={capacity}
-							/>
-							<PitchCard
-								_id={_id}
-								key={_id}
-								name={name}
-								images={images}
-								address={address}
-								capacity={capacity}
-							/>
-						</>
+						<PitchCard
+							_id={_id}
+							key={_id}
+							name={name}
+							images={images}
+							address={address}
+							capacity={capacity}
+						/>
 					)
 				)}
 			</div>

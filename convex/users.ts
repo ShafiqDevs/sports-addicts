@@ -27,3 +27,31 @@ export const RegisterNewUser = mutation({
 		});
 	},
 });
+
+export const GetUserById = query({
+	args: { id: v.id('users') },
+	handler: async (ctx, { id }) => {
+		return await ctx.db
+			.query('users')
+			.filter((q) => q.eq(q.field('_id'), id))
+			.first();
+	},
+});
+
+export const getUserByAuthId = query({
+	args: { auth_id: v.string() },
+	handler: async (ctx, { auth_id }) => {
+		return await ctx.db
+			.query('users')
+			.filter((q) => q.eq(q.field('clerk_id'), auth_id))
+			.first();
+	},
+});
+
+export const getUsersById = query({
+	args: { ids: v.array(v.id('users')) },
+	handler: async (ctx, { ids }) => {
+		const users = await Promise.all(ids.map((id) => ctx.db.get(id)));
+		return users ? users : null;
+	},
+});

@@ -26,7 +26,7 @@ interface PitchCardProps {
 	images: string[];
 }
 
-const CAROUSELL_TIMER = 3000;
+const CAROUSELL_TIMER = 7000;
 
 export function PitchCard({
 	_id,
@@ -53,7 +53,7 @@ export function PitchCard({
 	};
 
 	return (
-		<Card className='w-full max-w-md overflow-hidden bg-background'>
+		<Card className='w-full h-full max-w-md overflow-hidden bg-background'>
 			<div
 				className='relative aspect-video'
 				onMouseEnter={() => setIsHovered(true)}
@@ -82,7 +82,7 @@ export function PitchCard({
 							}
 							className='absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/80 text-foreground hover:bg-background/90 transition-colors'
 							aria-label='Previous image'>
-							<ChevronLeft className='h-4 w-4' />
+							<ChevronLeft className='h-3 w-3' />
 						</button>
 						<button
 							onClick={() =>
@@ -92,7 +92,7 @@ export function PitchCard({
 							}
 							className='absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/80 text-foreground hover:bg-background/90 transition-colors'
 							aria-label='Next image'>
-							<ChevronRight className='h-4 w-4' />
+							<ChevronRight className='h-3 w-3' />
 						</button>
 						<div className='absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1'>
 							{images.map((_, index) => (
@@ -115,11 +115,11 @@ export function PitchCard({
 				<CardTitle className='flex items-center justify-between'>
 					<Link
 						href={`${ROUTES.play}/${_id}`}
-						className='flex items-center justify-between'>
+						className='flex flex-col md:flex-row items-center justify-between w-full'>
 						<span>{name}</span>
 						<Badge
 							variant='secondary'
-							className='flex items-center gap-1'>
+							className='flex items-center gap-1 shrink-0'>
 							<Users className='h-4 w-4' />
 							{formatCapacity(capacity)}
 						</Badge>
@@ -127,10 +127,12 @@ export function PitchCard({
 				</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<div className='flex items-start gap-2 text-muted-foreground'>
+				<Link
+					href={`${ROUTES.play}/${_id}`}
+					className='flex items-start gap-2 text-muted-foreground'>
 					<MapPin className='h-4 w-4 mt-1 shrink-0' />
-					<p>{address}</p>
-				</div>
+					<p className='text-sm line-clamp-2'>{address}</p>
+				</Link>
 			</CardContent>
 		</Card>
 	);
