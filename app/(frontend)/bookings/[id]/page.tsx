@@ -297,6 +297,7 @@ export default function BookingDetailsPage({ params }: Props) {
 						teamList={booking?.teamA}
 						side='home'
 						pitch={pitch}
+						booking_status={booking.status}
 					/>
 					<TeamList
 						onJoinTeam={async (side, user) => {
@@ -325,6 +326,7 @@ export default function BookingDetailsPage({ params }: Props) {
 						teamList={booking?.teamB}
 						side='away'
 						pitch={pitch}
+						booking_status={booking.status}
 					/>
 				</div>
 			)}

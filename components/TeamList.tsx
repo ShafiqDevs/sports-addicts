@@ -17,8 +17,10 @@ import { useUser } from '@clerk/nextjs';
 import { useQuery } from 'convex/react';
 import { Users } from 'lucide-react';
 import TeamListSkeleton from './TeamListSkeleton';
+import Link from 'next/link';
 
 interface TeamListProps {
+	booking_status: Doc<'bookings'>['status'];
 	teamList: Id<'users'>[];
 	side: 'home' | 'away';
 	pitch: Doc<'pitches'>;
@@ -28,6 +30,7 @@ interface TeamListProps {
 }
 
 export function TeamList({
+	booking_status,
 	teamList,
 	side,
 	pitch,
@@ -47,7 +50,8 @@ export function TeamList({
 	return disabled ? (
 		<TeamListSkeleton />
 	) : (
-		<Card className='col-span-1'>
+		<Card
+			className={`col-span-1 ${booking_status === 'Completed' || (booking_status === 'Cancelled' && 'pointer-events-none')}`}>
 			<CardHeader>
 				<CardTitle className='flex items-center justify-between'>
 					<span>{side === 'home' ? 'Home Team' : 'Away Team'}</span>
@@ -103,17 +107,28 @@ export function TeamList({
 						))}
 				</div>
 
-				{currUser && (
+				{currUser &&
+				(booking_status === 'Cancelled' ||
+					booking_status === 'Completed') ? (
 					<Button
+						disabled
 						variant={isJoined ? 'destructive' : 'default'}
-						className='w-full'
-						onClick={() =>
-							isJoined
-								? onLeaveTeam(side, currUser)
-								: onJoinTeam(side, currUser)
-						}>
+						className='w-full'>
 						{isJoined ? 'Leave Team' : 'Join Team'}
 					</Button>
+				) : (
+					currUser && (
+						<Button
+							variant={isJoined ? 'destructive' : 'default'}
+							className='w-full'
+							onClick={() =>
+								isJoined
+									? onLeaveTeam(side, currUser)
+									: onJoinTeam(side, currUser)
+							}>
+							{isJoined ? 'Leave Team' : 'Join Team'}
+						</Button>
+					)
 				)}
 			</CardContent>
 		</Card>

@@ -140,14 +140,6 @@ export const insertNewBooking = mutation({
 	},
 });
 
-export const getPlayerCount = query({
-	args: { booking_id: v.id('bookings') },
-	handler: async (ctx, { booking_id }) => {
-		const booking = await ctx.db.get(booking_id);
-		if (!booking) return null;
-		return booking.teamA.length + booking.teamB.length;
-	},
-});
 
 export const joinBooking = mutation({
 	args: {
@@ -158,6 +150,15 @@ export const joinBooking = mutation({
 	handler: async (ctx, { booking_id, side, user_id }) => {
 		const booking = await ctx.db.get(booking_id);
 		if (!booking) return null;
+		if (
+			booking.status === 'Cancelled' ||
+			booking.status === 'Completed'
+		)
+			return {
+				message: 'Booking is not available',
+				data: null,
+				status: STATUS_CODES.CONFLICT,
+			};
 		const pitch = await ctx.db.get(booking.pitch_id);
 		if (!pitch) return null;
 		const teamCapacity = pitch.capacity / 2;
@@ -214,6 +215,12 @@ export const joinBooking = mutation({
 						status: STATUS_CODES.CONFLICT,
 					};
 				}
+			}
+			if (
+				updatedBooking.teamA.length + updatedBooking.teamB.length >=
+				pitch.capacity
+			) {
+				updatedBooking.status = 'Booked';
 			}
 			await ctx.db.patch(booking_id, updatedBooking);
 			return {
