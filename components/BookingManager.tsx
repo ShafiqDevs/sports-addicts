@@ -1,12 +1,12 @@
 'use client';
-import React, { useActionState } from 'react';
+import React, { useActionState, useEffect, useState } from 'react';
 import DateTimePicker from './DateTimePicker';
 import { BookingList } from './BookingList';
 import { Doc } from '@/convex/_generated/dataModel';
 import { BookingWithUserData } from '@/lib/types';
 import { useUser } from '@clerk/nextjs';
 import { createBookingRequest } from '@/actions/bookingRequests';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from './ui/button';
 import Link from 'next/link';
@@ -14,6 +14,7 @@ import { ROUTES } from '@/lib/routes';
 import { differenceInHours, format } from 'date-fns';
 import { CalendarIcon, ClockIcon } from 'lucide-react';
 import { STATUS_CODES } from '@/lib/statusCodes';
+import Loader from './Loader';
 
 type Props = {
 	bookings: BookingWithUserData[];
@@ -29,6 +30,14 @@ function BookingManager({
 	const { user, isLoaded, isSignedIn } = useUser();
 	const router = useRouter();
 	const { toast } = useToast();
+	const [isClient, setIsClient] = useState(false);
+
+	if (!user || !isSignedIn || !isLoaded) redirect(ROUTES.play);
+
+	useEffect(() => {
+		setIsClient(true);
+	}, []);
+	if (!isClient) return <Loader />;
 
 	async function submitBookingRequest(booking: {
 		selectedDateTime_start: Date;

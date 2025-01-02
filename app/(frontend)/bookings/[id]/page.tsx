@@ -15,13 +15,14 @@ import { TeamList } from '@/components/TeamList';
 import Image from 'next/image';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { useParams } from 'next/navigation';
+import { redirect, useParams } from 'next/navigation';
 import { Doc, Id } from '@/convex/_generated/dataModel';
 import { STATUS_CODES } from '@/lib/statusCodes';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUser } from '@clerk/nextjs';
 import { v4 as uuidv4 } from 'uuid';
+import Loader from '@/components/Loader';
 type Props = {
 	params: Promise<{ id: string }>;
 };
@@ -31,11 +32,8 @@ export default function BookingDetailsPage({ params }: Props) {
 	const [isClient, setIsClient] = useState(false);
 	const [isJoinPending, setIsJoinPending] = useState(false);
 	const { toast } = useToast();
-	const { user, isSignedIn } = useUser();
-
-	useEffect(() => {
-		setIsClient(true);
-	}, []);
+	const { user, isSignedIn, isLoaded } = useUser();
+	if (!user || !isSignedIn || !isLoaded) redirect('/login');
 
 	const booking = useQuery(api.bookings.getBookingById, {
 		booking_id: id as Id<'bookings'>,
@@ -60,9 +58,10 @@ export default function BookingDetailsPage({ params }: Props) {
 	const joinTeam = useMutation(api.bookings.joinBooking);
 	const leaveTeam = useMutation(api.bookings.leaveBooking);
 
-	if (!isClient) {
-		return null;
-	}
+	useEffect(() => {
+		setIsClient(true);
+	}, []);
+	if (!isClient) return <Loader />;
 
 	async function handleJoinTeam(
 		booking_id: Id<'bookings'>,

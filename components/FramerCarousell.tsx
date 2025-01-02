@@ -1,9 +1,10 @@
 'use client';
 import { AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card } from './ui/card';
+import Loader from './Loader';
 
 type Props = {
 	imageAltText?: string;
@@ -13,6 +14,13 @@ type Props = {
 function FramerCarousell({ images, imageAltText }: Props) {
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [isHovered, setIsHovered] = useState(false);
+	const [isClient, setIsClient] = useState(false);
+
+	useEffect(() => {
+		setIsClient(true);
+	}, []);
+	if (!isClient) return <Loader />;
+
 	return (
 		<Card className='w-full max-w-md overflow-hidden bg-background'>
 			<div

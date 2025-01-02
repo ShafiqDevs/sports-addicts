@@ -17,6 +17,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/routes';
+import Loader from './Loader';
 
 interface PitchCardProps {
 	_id: string;
@@ -37,6 +38,9 @@ export function PitchCard({
 }: PitchCardProps) {
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [isHovered, setIsHovered] = useState(false);
+	const [isClient, setIsClient] = useState(false);
+
+	
 
 	useEffect(() => {
 		if (!isHovered && images.length > 1) {
@@ -51,6 +55,11 @@ export function PitchCard({
 		const perSide = capacity / 2;
 		return `${perSide}-a-side`;
 	};
+
+	useEffect(() => {
+		setIsClient(true);
+	}, []);
+	if (!isClient) return <Loader />;
 
 	return (
 		<Card className='w-full h-full max-w-md overflow-hidden bg-background'>

@@ -26,6 +26,7 @@ export default async function PitchPage({
 	let pitch: Doc<'pitches'> | null;
 	let pitchImages: string[];
 
+
 	try {
 		const paramsResult = await params;
 		const searchParamsResult = await searchParams;
@@ -68,26 +69,6 @@ export default async function PitchPage({
 		'Play/[id]/page Bookings>>>',
 		JSON.stringify(bookings, null, 2)
 	);
-
-	// const pitch = {
-	// 	name: 'Champions Arena',
-	// 	capacity: 22,
-	// 	address: 'Football City, FC1 2BA',
-	// 	images: [
-	// 		'https://placehold.co/600x400.png',
-	// 		'https://placehold.co/600x400.png',
-	// 		'https://placehold.co/600x400.png',
-	// 		'https://placehold.co/600x400.png',
-	// 		'https://placehold.co/600x400.png',
-	// 	],
-
-	// 	host: {
-	// 		name: 'John Smith',
-	// 		image: '/placeholder.svg?height=50&width=50',
-	// 	},
-	// 	description:
-	// 		'Clean, modern football pitch with easy access to city center, great changing rooms, and public transportation. Perfect for matches and training sessions.',
-	// };
 
 	return (
 		<main className='w-full h-screen layoutXPadding'>
@@ -135,7 +116,7 @@ export default async function PitchPage({
 			<div className='flex sm:hidden items-center justify-center w-full h-fit'>
 				<FramerCarousell images={pitchImages} />
 			</div>
-			{/* //TODO: booking component here */}
+			
 			<BookingManager
 				selectedTimeStamp={booking_date}
 				bookings={bookings}
