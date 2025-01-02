@@ -1,6 +1,13 @@
 import { v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import {
+	internalMutation,
+	mutation,
+	query,
+} from './_generated/server';
 import { STATUS_CODES } from '@/lib/statusCodes';
+import { internal } from './_generated/api';
+import { differenceInMinutes } from 'date-fns';
+import { JOIN_CUTOFF_MINUTES } from '@/lib/constants';
 
 export const getBookingByDate = query({
 	args: { booking_start: v.number() },
@@ -116,7 +123,7 @@ export const insertNewBooking = mutation({
 			.first();
 
 		if (user) {
-			const booking = await ctx.db.insert('bookings', {
+			const newBooking_id = await ctx.db.insert('bookings', {
 				booking_start,
 				booking_end,
 				pitch_id,
@@ -125,7 +132,19 @@ export const insertNewBooking = mutation({
 				status: status as any,
 				hostingUser_id: user._id,
 			});
-			const newBooking = await ctx.db.get(booking);
+			const newBooking = await ctx.db.get(newBooking_id);
+			if (!newBooking?.booking_end) {
+				return {
+					message: 'Booking had invlid end time',
+					data: null,
+					status: STATUS_CODES.INTERNAL_SERVER_ERROR,
+				};
+			}
+			await ctx.scheduler.runAt(
+				newBooking.booking_end,
+				internal.bookings.cancelBooking,
+				{ booking_id: newBooking_id }
+			);
 			return {
 				message: 'Booking created successfully',
 				data: newBooking,
@@ -140,7 +159,6 @@ export const insertNewBooking = mutation({
 	},
 });
 
-
 export const joinBooking = mutation({
 	args: {
 		booking_id: v.id('bookings'),
@@ -150,6 +168,19 @@ export const joinBooking = mutation({
 	handler: async (ctx, { booking_id, side, user_id }) => {
 		const booking = await ctx.db.get(booking_id);
 		if (!booking) return null;
+
+		const minUntilBookingStarts = differenceInMinutes(
+			booking.booking_start,
+			Date.now()
+		);
+		if (minUntilBookingStarts < JOIN_CUTOFF_MINUTES) {
+			return {
+				message:
+					'You cannot join or switch teams when the game is about to start',
+				data: null,
+				status: STATUS_CODES.CONFLICT,
+			};
+		}
 		if (
 			booking.status === 'Cancelled' ||
 			booking.status === 'Completed'
@@ -285,6 +316,32 @@ export const leaveBooking = mutation({
 			await ctx.db.patch(booking_id, updatedBooking);
 			return {
 				message: `You have left ${side}`,
+				data: updatedBooking,
+				status: STATUS_CODES.OK,
+			};
+		} catch (error) {
+			console.log(error);
+			return {
+				message: 'Whoops! Something went wrong',
+				data: null,
+				status: STATUS_CODES.INTERNAL_SERVER_ERROR,
+			};
+		}
+	},
+});
+
+export const cancelBooking = internalMutation({
+	args: { booking_id: v.id('bookings') },
+	handler: async (ctx, { booking_id }) => {
+		const booking = await ctx.db.get(booking_id);
+		if (!booking) return null;
+		const updatedBooking = { ...booking };
+
+		try {
+			updatedBooking.status = 'Completed';
+			await ctx.db.patch(booking_id, updatedBooking);
+			return {
+				message: `Booking has been cancelled`,
 				data: updatedBooking,
 				status: STATUS_CODES.OK,
 			};
