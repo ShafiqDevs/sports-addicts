@@ -20,7 +20,8 @@ import { Doc, Id } from '@/convex/_generated/dataModel';
 import { STATUS_CODES } from '@/lib/statusCodes';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
-
+import { useUser } from '@clerk/nextjs';
+import { v4 as uuidv4 } from 'uuid';
 type Props = {
 	params: Promise<{ id: string }>;
 };
@@ -30,6 +31,7 @@ export default function BookingDetailsPage({ params }: Props) {
 	const [isClient, setIsClient] = useState(false);
 	const [isJoinPending, setIsJoinPending] = useState(false);
 	const { toast } = useToast();
+	const { user, isSignedIn } = useUser();
 
 	useEffect(() => {
 		setIsClient(true);
@@ -49,6 +51,10 @@ export default function BookingDetailsPage({ params }: Props) {
 
 	const pitchImage = useQuery(api.files.getFileUrl, {
 		storageId: pitch?.images[0],
+	});
+
+	const currUser = useQuery(api.users.getUserByAuthId, {
+		auth_id: user?.id!,
 	});
 
 	const joinTeam = useMutation(api.bookings.joinBooking);
@@ -245,7 +251,11 @@ export default function BookingDetailsPage({ params }: Props) {
 													.join('')}
 											</AvatarFallback>
 										</Avatar>
-										<span>{host.user_name}</span>
+										<span>
+											{host._id === currUser?._id
+												? 'You'
+												: host.user_name}
+										</span>
 									</div>
 								</div>
 							</div>
@@ -271,6 +281,7 @@ export default function BookingDetailsPage({ params }: Props) {
 			{booking?.teamA && booking?.teamB && pitch && (
 				<div className='grid gap-6 md:grid-cols-2'>
 					<TeamList
+						key={uuidv4()}
 						onJoinTeam={async (side, user) => {
 							console.log(`joining ${side}`);
 							try {
@@ -300,6 +311,7 @@ export default function BookingDetailsPage({ params }: Props) {
 						booking_status={booking.status}
 					/>
 					<TeamList
+						key={uuidv4()}
 						onJoinTeam={async (side, user) => {
 							console.log(`joining ${side}`);
 							try {

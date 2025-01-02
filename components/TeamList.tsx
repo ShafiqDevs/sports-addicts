@@ -17,7 +17,7 @@ import { useUser } from '@clerk/nextjs';
 import { useQuery } from 'convex/react';
 import { Users } from 'lucide-react';
 import TeamListSkeleton from './TeamListSkeleton';
-import Link from 'next/link';
+import { v4 as uuidv4 } from 'uuid';
 
 interface TeamListProps {
 	booking_status: Doc<'bookings'>['status'];
@@ -71,7 +71,7 @@ export function TeamList({
 						(player) =>
 							player && (
 								<div
-									key={player?._id}
+									key={uuidv4()}
 									className='flex items-center gap-3'>
 									<Avatar>
 										<AvatarImage
@@ -85,7 +85,11 @@ export function TeamList({
 												.join('')}
 										</AvatarFallback>
 									</Avatar>
-									<span className='flex-1'>{player.user_name}</span>
+									<span className='flex-1'>
+										{player._id === currUser?._id
+											? 'You'
+											: player.user_name}
+									</span>
 								</div>
 							)
 					)}
@@ -96,7 +100,9 @@ export function TeamList({
 							{ length: teamAvailableSpots },
 							(_, i) => i
 						).map((_) => (
-							<div className='flex items-center gap-3 text-muted-foreground'>
+							<div
+								key={uuidv4()}
+								className='flex items-center gap-3 text-muted-foreground'>
 								<Avatar>
 									<AvatarFallback>
 										<Users className='h-4 w-4' />
