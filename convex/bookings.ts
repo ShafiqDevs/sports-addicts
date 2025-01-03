@@ -6,7 +6,7 @@ import {
 } from './_generated/server';
 import { STATUS_CODES } from '@/lib/statusCodes';
 import { internal } from './_generated/api';
-import { differenceInMinutes } from 'date-fns';
+import { compareAsc, differenceInMinutes } from 'date-fns';
 import { JOIN_CUTOFF_MINUTES } from '@/lib/constants';
 
 export const getBookingByDate = query({
@@ -117,6 +117,13 @@ export const insertNewBooking = mutation({
 				status: STATUS_CODES.CONFLICT,
 			};
 
+		if (compareAsc(new Date(), new Date(booking_start)) > 0) {
+			return {
+				message: 'Booking start time cannot be in the past',
+				data: null,
+				status: STATUS_CODES.CONFLICT,
+			};
+		}
 		const user = await ctx.db
 			.query('users')
 			.filter((q) => q.eq(q.field('clerk_id'), auth_user_id))

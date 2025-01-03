@@ -17,7 +17,7 @@ import {
 	CardTitle,
 } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
-import { addHours, set } from 'date-fns';
+import { addHours, nextMonday, nextSaturday, set } from 'date-fns';
 import Form from 'next/form';
 
 type Props = {
@@ -50,23 +50,42 @@ export default function DateTimePicker({
 		null
 	);
 
-	const handleRangeSelection = (range: 'today' | 'week') => {
+	function navigateToDate(date: Date) {
+		const newDateTime = date;
+		newDateTime.setHours(
+			selectedDateTime_start.getHours(),
+			selectedDateTime_start.getMinutes(),
+			0,
+			0
+		);
+		setSelectedDateTime_start(newDateTime);
+		const matchedEndDate = selectedDateTime_end;
+		matchedEndDate?.setDate(newDateTime.getDate());
+		setSelectedDateTime_end(matchedEndDate);
+		const url = new URL(window.location.href);
+		url.searchParams.set(
+			'booking_date',
+			newDateTime.getTime().toString()
+		);
+		router.push(url.toString(), { scroll: false }); // Update URL and rerender on the server
+	}
+
+	const handleRangeSelection = (
+		range: 'today' | 'next_week' | 'this_weekend'
+	) => {
 		const now = new Date();
-		if (range === 'today') {
-			setSelectedDateTime_start(now);
-			const url = new URL(window.location.href);
-			url.searchParams.set('booking_date', now.getTime().toString());
-			router.push(url.toString(), { scroll: false }); // Update URL and rerender on the server
-		} else if (range === 'week') {
-			const endOfWeek = new Date(now);
-			endOfWeek.setDate(now.getDate() + (7 - now.getDay()));
-			setSelectedDateTime_start(endOfWeek);
-			const url = new URL(window.location.href);
-			url.searchParams.set(
-				'booking_date',
-				endOfWeek.getTime().toString()
-			);
-			router.push(url.toString(), { scroll: false }); // Update URL and rerender on the server
+		switch (range) {
+			case 'today':
+				navigateToDate(now);
+				break;
+			case 'next_week':
+				navigateToDate(nextMonday(now));
+				break;
+			case 'this_weekend': // Assuming Saturday as the weekend start
+				navigateToDate(nextSaturday(now));
+				break;
+			default:
+				break;
 		}
 	};
 
@@ -131,10 +150,16 @@ export default function DateTimePicker({
 								Today
 							</Button>
 							<Button
-								onClick={() => handleRangeSelection('week')}
+								onClick={() => handleRangeSelection('next_week')}
 								variant='outline'
 								className='w-full justify-start text-left font-normal'>
-								This Week
+								Next Week
+							</Button>
+							<Button
+								onClick={() => handleRangeSelection('this_weekend')}
+								variant='outline'
+								className='w-full justify-start text-left font-normal'>
+								This Weekend
 							</Button>
 						</div>
 					</div>

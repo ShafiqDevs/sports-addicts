@@ -9,6 +9,8 @@ import { ThemeProvider } from '@/lib/ThemeProvider';
 import { ThemeSwitch } from '@/components/ThemeSwitch';
 import { Toaster } from '@/components/ui/toaster';
 import { ConvexClientProvider } from '@/components/ConvexProviderHelper';
+import Link from 'next/link';
+import { ROUTES } from '@/lib/routes';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -44,9 +46,27 @@ export default function DashboardLayout({
 							<div className='w-full '>
 								<div className='sticky top-0 w-full navBarheight  flex flex-row justify-end items-center bg-card layoutXPadding py-4 z-[99] border-b border-border '>
 									<div className='w-full flex flex-col md:flex-row items-center justify-between gap-8'>
-										<span className='order-last md:order-first'>
-											next game on: 31 Dec at 7:00
+										<span className='text-2xl md:text-4xl text-primary font-bold whitespace-nowrap '>
+											Sports Addicts
 										</span>
+										<div className='flex flex-wrap justify-center md:justify-end w-full gap-4'>
+											<Link
+												href={ROUTES.home}
+												scroll={false}
+												className='text-sm font-medium text-primary hover:underline'>
+												Home
+											</Link>
+											<Link
+												href={ROUTES.play}
+												className='text-sm font-medium text-primary hover:underline'>
+												Play
+											</Link>
+											<Link
+												href={ROUTES.support}
+												className='text-sm font-medium text-primary hover:underline'>
+												Support
+											</Link>
+										</div>
 										<div className='flex items-center justify-end gap-8'>
 											<SearchBar />
 											<div

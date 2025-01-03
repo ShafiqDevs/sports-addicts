@@ -26,7 +26,6 @@ export default async function PitchPage({
 	let pitch: Doc<'pitches'> | null;
 	let pitchImages: string[];
 
-
 	try {
 		const paramsResult = await params;
 		const searchParamsResult = await searchParams;
@@ -71,7 +70,30 @@ export default async function PitchPage({
 	);
 
 	return (
-		<main className='w-full h-screen layoutXPadding'>
+		<main className='relative w-full min-h-screen layoutXPadding overflow-hidden'>
+			{/* SVG Shapes */}
+			<div className='absolute inset-0 pointer-events-none z-0'>
+				<svg
+					className='absolute top-0 left-0 w-1/3 h-auto text-primary/10'
+					viewBox='0 0 200 200'
+					xmlns='http://www.w3.org/2000/svg'>
+					<path
+						fill='currentColor'
+						d='M44.7,-76.4C58.8,-69.2,71.8,-59.1,79.6,-45.8C87.4,-32.6,90,-16.3,89.4,-0.3C88.8,15.7,85.1,31.3,76.9,44.3C68.7,57.3,56.1,67.6,42.2,74.3C28.3,81,14.1,84.1,-0.7,85.3C-15.5,86.5,-31.1,85.8,-44.1,79.1C-57.1,72.4,-67.6,59.7,-74.9,45.4C-82.2,31,-86.3,15.5,-87.6,-0.7C-88.9,-17,-87.4,-34,-79.1,-46.6C-70.8,-59.2,-55.7,-67.4,-41.1,-74.6C-26.5,-81.8,-13.2,-88,1.8,-91C16.8,-94,33.6,-93.8,44.7,-76.4Z'
+						transform='translate(100 100)'
+					/>
+				</svg>
+				<svg
+					className='absolute bottom-0 right-0 w-1/2 h-auto text-secondary/10'
+					viewBox='0 0 200 200'
+					xmlns='http://www.w3.org/2000/svg'>
+					<path
+						fill='currentColor'
+						d='M39.9,-65.7C54.1,-60.5,69.3,-53.3,77.7,-41.3C86.2,-29.3,87.9,-12.7,85.6,2.9C83.4,18.5,77.2,33,67.1,44C57,55,43,62.4,28.7,68.7C14.4,75,-0.3,80.2,-14.9,78.9C-29.5,77.5,-44,69.6,-56.4,59C-68.8,48.4,-79.1,35.1,-83.7,19.9C-88.3,4.7,-87.2,-12.4,-80.8,-26.8C-74.4,-41.1,-62.8,-52.7,-49.5,-58.5C-36.2,-64.3,-21.3,-64.3,-6.8,-64.1C7.7,-63.9,25.7,-70.9,39.9,-65.7Z'
+						transform='translate(100 100)'
+					/>
+				</svg>
+			</div>
 			{/* Header */}
 			<div className=' bg- flex justify-between items-center py-6'>
 				<h1 className='text-2xl font-medium'>{pitch.name}</h1>
@@ -116,7 +138,7 @@ export default async function PitchPage({
 			<div className='flex sm:hidden items-center justify-center w-full h-fit'>
 				<FramerCarousell images={pitchImages} />
 			</div>
-			
+
 			<BookingManager
 				selectedTimeStamp={booking_date}
 				bookings={bookings}
