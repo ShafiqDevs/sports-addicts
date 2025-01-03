@@ -149,7 +149,7 @@ export const insertNewBooking = mutation({
 			}
 			await ctx.scheduler.runAt(
 				newBooking.booking_end,
-				internal.bookings.cancelBooking,
+				internal.bookings.cancelBooking_internal,
 				{ booking_id: newBooking_id }
 			);
 			return {
@@ -163,6 +163,39 @@ export const insertNewBooking = mutation({
 				data: null,
 				status: STATUS_CODES.UNAUTHORIZED,
 			};
+	},
+});
+
+export const cancelBooking = mutation({
+	args: { booking_id: v.id('bookings'), user_id: v.id('users') },
+	handler: async (ctx, { booking_id, user_id }) => {
+		const booking = await ctx.db.get(booking_id);
+		if (!booking)
+			return {
+				message: 'Booking not found',
+				data: null,
+				status: STATUS_CODES.INTERNAL_SERVER_ERROR,
+			};
+		else if (booking) {
+			if (booking.hostingUser_id !== user_id)
+				return {
+					message: 'You are not authorized to cancel this booking',
+					data: null,
+					status: STATUS_CODES.UNAUTHORIZED,
+				};
+			await ctx.db.patch(booking_id, { status: 'Cancelled' });
+			return {
+				message: 'Booking cancelled successfully',
+				data: booking,
+				status: STATUS_CODES.OK,
+			};
+		} else {
+			return {
+				message: 'Whoops.. Something went wrong',
+				data: null,
+				status: STATUS_CODES.INTERNAL_SERVER_ERROR,
+			};
+		}
 	},
 });
 
@@ -337,7 +370,7 @@ export const leaveBooking = mutation({
 	},
 });
 
-export const cancelBooking = internalMutation({
+export const cancelBooking_internal = internalMutation({
 	args: { booking_id: v.id('bookings') },
 	handler: async (ctx, { booking_id }) => {
 		const booking = await ctx.db.get(booking_id);

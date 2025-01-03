@@ -1,7 +1,8 @@
 'use server';
 
 import { api } from '@/convex/_generated/api';
-import { Doc } from '@/convex/_generated/dataModel';
+import { Doc, Id } from '@/convex/_generated/dataModel';
+import { STATUS_CODES } from '@/lib/statusCodes';
 import { convex } from '@/lib/utils';
 
 export async function createBookingRequest(
@@ -39,6 +40,28 @@ export async function createBookingRequest(
 			message: 'Error creating booking',
 			data: null,
 			status: 500,
+		};
+	}
+}
+
+export async function cancelBooking(
+	_booking_id: string,
+	_user_id: string
+) {
+	try {
+		let booking_id = _booking_id as Id<'bookings'>;
+		let user_id = _user_id as Id<'users'>;
+		const response = await convex.mutation(
+			api.bookings.cancelBooking,
+			{ booking_id, user_id }
+		);
+		return response;
+	} catch (error) {
+		console.log(error);
+		return {
+			message: 'Whoops... Something went wrong',
+			data: null,
+			status: STATUS_CODES.INTERNAL_SERVER_ERROR,
 		};
 	}
 }

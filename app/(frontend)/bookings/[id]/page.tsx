@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { CalendarIcon, MapPinIcon, Clock } from 'lucide-react';
 import {
@@ -23,6 +23,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useUser } from '@clerk/nextjs';
 import { v4 as uuidv4 } from 'uuid';
 import Loader from '@/components/Loader';
+import { Button } from '@/components/ui/button';
+import { cancelBooking } from '@/actions/bookingRequests';
 type Props = {
 	params: Promise<{ id: string }>;
 };
@@ -31,6 +33,15 @@ export default function BookingDetailsPage({ params }: Props) {
 	const { id } = useParams<{ id: string }>();
 	const [isClient, setIsClient] = useState(false);
 	const [isJoinPending, setIsJoinPending] = useState(false);
+	const [_, cancelBookingAction, isBookingCancellationPending] =
+		useActionState(
+			async () =>
+				handleCancelBooking(
+					booking?._id as string,
+					currUser?._id as string
+				),
+			null
+		);
 	const { toast } = useToast();
 	const { user, isSignedIn, isLoaded } = useUser();
 	if (!user || !isSignedIn || !isLoaded) redirect('/login');
@@ -57,6 +68,8 @@ export default function BookingDetailsPage({ params }: Props) {
 
 	const joinTeam = useMutation(api.bookings.joinBooking);
 	const leaveTeam = useMutation(api.bookings.leaveBooking);
+
+	const isHost = host?._id === currUser?._id;
 
 	useEffect(() => {
 		setIsClient(true);
@@ -179,6 +192,61 @@ export default function BookingDetailsPage({ params }: Props) {
 				break;
 		}
 	}
+	async function handleCancelBooking(
+		booking_id?: string,
+		user_id?: string
+	) {
+		if (!booking_id || !user_id) return;
+		const response = await cancelBooking(booking_id, user_id);
+
+		switch (response.status) {
+			case STATUS_CODES.OK:
+				toast({
+					duration: 4000,
+					variant: 'default',
+					title: `Booking Cancellation`,
+					description: (
+						<div className='flex flex-col gap-3 w-full'>
+							<div className='flex flex-col gap-1'>
+								<span>{response.message}</span>
+							</div>
+						</div>
+					),
+				});
+				break;
+			case STATUS_CODES.UNAUTHORIZED:
+				toast({
+					duration: 4000,
+					variant: 'destructive',
+					title: `Whoops..`,
+					description: (
+						<div className='flex flex-col gap-3 w-full'>
+							<div className='flex flex-col gap-1'>
+								<span>{response.message}</span>
+							</div>
+						</div>
+					),
+				});
+				break;
+
+			case STATUS_CODES.INTERNAL_SERVER_ERROR:
+				toast({
+					duration: 4000,
+					variant: 'destructive',
+					title: `Whoops..`,
+					description: (
+						<div className='flex flex-col gap-3 w-full'>
+							<div className='flex flex-col gap-1'>
+								<span>{response.message}</span>
+							</div>
+						</div>
+					),
+				});
+				break;
+			default:
+				break;
+		}
+	}
 
 	return (
 		<div className='container mx-auto py-10 space-y-8'>
@@ -186,7 +254,7 @@ export default function BookingDetailsPage({ params }: Props) {
 				<Card>
 					<CardContent className='p-6'>
 						<div className='grid gap-6 md:grid-cols-2'>
-							<div className='space-y-4'>
+							<div className='flex flex-col gap-4'>
 								<div className='space-y-2'>
 									<h1 className='text-2xl font-bold'>
 										Football Match
@@ -235,27 +303,40 @@ export default function BookingDetailsPage({ params }: Props) {
 
 								<Separator />
 
-								<div className='space-y-2'>
-									<h2 className='text-sm font-medium'>Hosted by</h2>
-									<div className='flex items-center gap-2'>
-										<Avatar>
-											<AvatarImage
-												src={host.user_profile_image_url}
-												alt={host.user_name}
-											/>
-											<AvatarFallback>
-												{host.user_name
-													.split(' ')
-													.map((n) => n[0])
-													.join('')}
-											</AvatarFallback>
-										</Avatar>
-										<span>
-											{host._id === currUser?._id
-												? 'You'
-												: host.user_name}
-										</span>
+								<div className='flex flex-wrap justify-between w-full'>
+									<div className=' space-y-2 bg-yellow-5001'>
+										<h2 className='text-sm font-medium'>Hosted by</h2>
+										<div className='flex items-center gap-2'>
+											<Avatar>
+												<AvatarImage
+													src={host.user_profile_image_url}
+													alt={host.user_name}
+												/>
+												<AvatarFallback>
+													{host.user_name
+														.split(' ')
+														.map((n) => n[0])
+														.join('')}
+												</AvatarFallback>
+											</Avatar>
+											<span>
+												{host._id === currUser?._id
+													? 'You'
+													: host.user_name}
+											</span>
+										</div>
 									</div>
+									{isHost && (
+										<Button
+											disabled={isBookingCancellationPending}
+											className=''
+											variant={'destructive'}
+											onClick={cancelBookingAction}>
+											{isBookingCancellationPending
+												? '1 sec...'
+												: 'Cancel Booking'}
+										</Button>
+									)}
 								</div>
 							</div>
 
