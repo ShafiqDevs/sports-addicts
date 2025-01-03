@@ -1,5 +1,6 @@
 import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
+import { STATUS_CODES } from '@/lib/statusCodes';
 
 export const RegisterNewUser = mutation({
 	args: {
@@ -15,16 +16,34 @@ export const RegisterNewUser = mutation({
 		// check if user already exists
 		const user = await ctx.db
 			.query('users')
-			.withIndex('byClerkId')
+			.filter((q) => q.eq(q.field('clerk_id'), clerk_id))
 			.first();
-		if (user) return;
+		if (user)
+			return {
+				message: 'User already exists',
+				data: null,
+				status: STATUS_CODES.CONFLICT,
+			};
 		// create new user record in the database
-		await ctx.db.insert('users', {
+		const user_id = await ctx.db.insert('users', {
 			clerk_id,
 			user_email,
 			user_name,
 			user_profile_image_url,
 		});
+		if (user_id)
+			return {
+				message: 'User registered successfully',
+				data: user_id,
+				status: STATUS_CODES.CREATED,
+			};
+		else {
+			return {
+				message: 'User not registered',
+				data: null,
+				status: STATUS_CODES.INTERNAL_SERVER_ERROR,
+			};
+		}
 	},
 });
 

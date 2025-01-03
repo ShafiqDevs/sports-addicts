@@ -11,6 +11,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { ConvexClientProvider } from '@/components/ConvexProviderHelper';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/routes';
+import SyncUserWithConvex from '@/components/SyncUserWithConvex';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -80,6 +81,7 @@ export default function DashboardLayout({
 								</div>
 								{children}
 							</div>
+							<SyncUserWithConvex />
 						</ClerkProvider>
 					</ThemeProvider>
 				</ConvexClientProvider>

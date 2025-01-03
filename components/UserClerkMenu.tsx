@@ -8,27 +8,11 @@ import {
 } from '@clerk/nextjs';
 import React, { useEffect } from 'react';
 import { Button } from './ui/button';
-import { registerUser } from '@/actions/userAuthentications';
+
 
 type Props = {};
 
 function UserClerkMenu({}: Props) {
-	const { user, isSignedIn, isLoaded } = useUser();
-	useEffect(() => {
-		if (user && isSignedIn) {
-			registerUser(
-				user.id,
-				user.username ||
-					user.firstName ||
-					user.lastName ||
-					user.fullName ||
-					'',
-				user.primaryEmailAddress?.emailAddress ||
-					user.emailAddresses[0].emailAddress,
-				user.imageUrl
-			);
-		}
-	}, [user, isSignedIn, isLoaded]);
 
 	return (
 		<div className=' flex justify-center items-center w-fit h-fit'>
