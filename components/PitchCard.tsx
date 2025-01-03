@@ -18,13 +18,16 @@ import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/routes';
 import Loader from './Loader';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 
 interface PitchCardProps {
 	_id: string;
 	name: string;
 	capacity: number;
 	address: string;
-	images: string[];
+	images: Id<'_storage'>[];
 }
 
 const CAROUSELL_TIMER = 7000;
@@ -34,22 +37,23 @@ export function PitchCard({
 	name,
 	capacity,
 	address,
-	images,
+	images: imageIDs,
 }: PitchCardProps) {
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [isHovered, setIsHovered] = useState(false);
 	const [isClient, setIsClient] = useState(false);
-
-	
+	const images = useQuery(api.files.getFiles, {
+		storageIds: imageIDs,
+	});
 
 	useEffect(() => {
-		if (!isHovered && images.length > 1) {
+		if (!isHovered && images && images.length > 1) {
 			const timer = setInterval(() => {
 				setCurrentImageIndex((prev) => (prev + 1) % images.length);
 			}, CAROUSELL_TIMER);
 			return () => clearInterval(timer);
 		}
-	}, [isHovered, images.length]);
+	}, [isHovered, images]);
 
 	const formatCapacity = (capacity: number) => {
 		const perSide = capacity / 2;
@@ -70,18 +74,20 @@ export function PitchCard({
 				<AnimatePresence
 					initial={false}
 					mode='wait'>
-					<motion.img
-						key={currentImageIndex}
-						src={images[currentImageIndex]}
-						alt={`${name} - View ${currentImageIndex + 1}`}
-						className='absolute inset-0 w-full h-full object-cover'
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						exit={{ opacity: 0 }}
-						transition={{ duration: 0.5 }}
-					/>
+					{images && (
+						<motion.img
+							key={currentImageIndex}
+							src={images[currentImageIndex]}
+							alt={`${name} - View ${currentImageIndex + 1}`}
+							className='absolute inset-0 w-full h-full object-cover'
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							transition={{ duration: 0.5 }}
+						/>
+					)}
 				</AnimatePresence>
-				{images.length > 1 && (
+				{images && images.length > 1 && (
 					<>
 						<button
 							onClick={() =>

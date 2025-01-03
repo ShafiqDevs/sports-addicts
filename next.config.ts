@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
 				hostname: 'dapper-mallard-357.convex.cloud',
 				protocol: 'https',
 			},
+			{
+				hostname: 'fearless-crow-657.convex.cloud',
+				protocol: 'https',
+			},
 		],
 	},
 };
