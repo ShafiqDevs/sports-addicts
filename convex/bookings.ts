@@ -6,8 +6,148 @@ import {
 } from './_generated/server';
 import { STATUS_CODES } from '@/lib/statusCodes';
 import { internal } from './_generated/api';
-import { compareAsc, differenceInMinutes } from 'date-fns';
+import {
+	compareAsc,
+	differenceInMinutes,
+	endOfToday,
+	endOfTomorrow,
+	startOfToday,
+	startOfTomorrow,
+} from 'date-fns';
 import { JOIN_CUTOFF_MINUTES } from '@/lib/constants';
+import { Doc } from './_generated/dataModel';
+import { BookingWithUserData } from '@/lib/types';
+
+export const getAllBookings = query({
+	args: {},
+	handler: async (ctx) => {
+		const bookings = await ctx.db.query('bookings').collect();
+		if (bookings.length === 0)
+			return {
+				message: 'No bookings found',
+				data: null,
+				status: STATUS_CODES.NOT_FOUND,
+			};
+		else if (!bookings) {
+			return {
+				message: 'Whoops! Something went wrong',
+				data: null,
+				status: STATUS_CODES.INTERNAL_SERVER_ERROR,
+			};
+		} else
+			return {
+				message: 'Bookings found',
+				data: bookings,
+				status: STATUS_CODES.OK,
+			};
+	},
+});
+
+export const getBookingsByFilter = query({
+	args: {
+		date: v.optional(v.string()),
+		size: v.optional(v.string()),
+	},
+	handler: async (ctx, { date, size }) => {
+		let bookings: BookingWithUserData[] = [];
+
+		// Filter by date
+		if (date) {
+			const today = startOfToday().getTime();
+			const tomorrow = startOfTomorrow().getTime();
+			const endToday = endOfToday().getTime();
+			const endTomorrow = endOfTomorrow().getTime();
+
+			if (date === 'all') {
+				const filteredBookings = await ctx.db
+					.query('bookings')
+					.collect();
+				bookings = await Promise.all(
+					filteredBookings.map(async (filteredBooking, index) => {
+						const hostingUser = await ctx.db.get(
+							filteredBooking.hostingUser_id
+						);
+						const pitch = await ctx.db.get(filteredBooking.pitch_id);
+						return { ...filteredBooking, hostingUser, pitch };
+					})
+				);
+			} else if (date === 'today') {
+				const filteredBookings = await ctx.db
+					.query('bookings')
+					.filter((q) =>
+						q.and(
+							q.gte(q.field('booking_start'), today),
+							q.lte(q.field('booking_start'), endToday)
+						)
+					)
+					.collect();
+				bookings = await Promise.all(
+					filteredBookings.map(async (filteredBooking, index) => {
+						const hostingUser = await ctx.db.get(
+							filteredBooking.hostingUser_id
+						);
+						const pitch = await ctx.db.get(filteredBooking.pitch_id);
+						return { ...filteredBooking, hostingUser, pitch };
+					})
+				);
+			} else if (date === 'tomorrow') {
+				const filteredBookings = await ctx.db
+					.query('bookings')
+					.filter((q) =>
+						q.and(
+							q.gte(q.field('booking_start'), tomorrow),
+							q.lte(q.field('booking_start'), endTomorrow)
+						)
+					)
+					.collect();
+				bookings = await Promise.all(
+					filteredBookings.map(async (filteredBooking, index) => {
+						const hostingUser = await ctx.db.get(
+							filteredBooking.hostingUser_id
+						);
+						const pitch = await ctx.db.get(filteredBooking.pitch_id);
+						return { ...filteredBooking, hostingUser, pitch };
+					})
+				);
+			}
+		}
+		// Filter by size
+		else if (size) {
+			const filteredBookings = await ctx.db
+				.query('bookings')
+				.filter((q) => q.eq(q.field('size'), size))
+				.collect();
+			bookings = await Promise.all(
+				filteredBookings.map(async (filteredBooking, index) => {
+					const hostingUser = await ctx.db.get(
+						filteredBooking.hostingUser_id
+					);
+					const pitch = await ctx.db.get(filteredBooking.pitch_id);
+					return { ...filteredBooking, hostingUser, pitch };
+				})
+			);
+		} else {
+			const filteredBookings = await ctx.db
+				.query('bookings')
+				.collect();
+			bookings = await Promise.all(
+				filteredBookings.map(async (filteredBooking, index) => {
+					const hostingUser = await ctx.db.get(
+						filteredBooking.hostingUser_id
+					);
+					const pitch = await ctx.db.get(filteredBooking.pitch_id);
+					return { ...filteredBooking, hostingUser, pitch };
+				})
+			);
+		}
+
+		return {
+			message: 'Bookings found',
+			data: bookings,
+			status: STATUS_CODES.OK,
+		};
+	},
+});
 
 export const getBookingByDate = query({
 	args: { booking_start: v.number() },
@@ -129,13 +269,18 @@ export const insertNewBooking = mutation({
 			.filter((q) => q.eq(q.field('clerk_id'), auth_user_id))
 			.first();
 
-		if (user) {
+		const pitch = await ctx.db.get(pitch_id);
+
+		if (user && pitch) {
+			const sizeLabel =
+				`${pitch.capacity / 2}-a-side` as Doc<'bookings'>['size'];
 			const newBooking_id = await ctx.db.insert('bookings', {
 				booking_start,
 				booking_end,
 				pitch_id,
 				teamA: [user._id],
 				teamB: [],
+				size: sizeLabel,
 				status: status as any,
 				hostingUser_id: user._id,
 			});

@@ -13,7 +13,13 @@ export default defineSchema({
 	}).index('byClerkId', ['clerk_id']),
 	pitches: defineTable({
 		name: v.string(),
-		capacity: v.number(),
+		capacity: v.union(
+			v.literal(22),
+			v.literal(20),
+			v.literal(16),
+			v.literal(12),
+			v.literal(10)
+		),
 		address: v.string(),
 		images: v.array(v.id('_storage')),
 		description: v.string(),
@@ -25,6 +31,13 @@ export default defineSchema({
 		booking_end: v.number(), // dates will be in timestamp format
 		teamA: v.array(v.id('users')),
 		teamB: v.array(v.id('users')),
+		size: v.union(
+			v.literal('5-a-side'),
+			v.literal('6-a-side'),
+			v.literal('8-a-side'),
+			v.literal('10-a-side'),
+			v.literal('11-a-side')
+		),
 		status: v.union(
 			v.literal('Available'),
 			v.literal('Booked'),

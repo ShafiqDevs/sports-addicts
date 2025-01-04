@@ -386,6 +386,7 @@ export default function BookingDetailsPage({ params }: Props) {
 						}}
 						disabled={isJoinPending}
 						teamList={booking?.teamA}
+						hostingUser_id={booking?.hostingUser_id}
 						side='home'
 						pitch={pitch}
 						booking_status={booking.status}
@@ -416,6 +417,7 @@ export default function BookingDetailsPage({ params }: Props) {
 						}}
 						disabled={isJoinPending}
 						teamList={booking?.teamB}
+						hostingUser_id={booking?.hostingUser_id}
 						side='away'
 						pitch={pitch}
 						booking_status={booking.status}

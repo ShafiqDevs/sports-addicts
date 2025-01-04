@@ -12,6 +12,7 @@ import { ConvexClientProvider } from '@/components/ConvexProviderHelper';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/routes';
 import SyncUserWithConvex from '@/components/SyncUserWithConvex';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -63,6 +64,11 @@ export default function DashboardLayout({
 												Play
 											</Link>
 											<Link
+												href={ROUTES.bookings}
+												className='text-sm font-medium text-primary hover:underline'>
+												Bookings
+											</Link>
+											<Link
 												href={ROUTES.support}
 												className='text-sm font-medium text-primary hover:underline'>
 												Support
@@ -79,7 +85,7 @@ export default function DashboardLayout({
 										</div>
 									</div>
 								</div>
-								{children}
+								<NuqsAdapter>{children}</NuqsAdapter>
 							</div>
 							<SyncUserWithConvex />
 						</ClerkProvider>

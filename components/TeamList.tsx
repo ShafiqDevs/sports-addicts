@@ -22,6 +22,7 @@ import { v4 as uuidv4 } from 'uuid';
 interface TeamListProps {
 	booking_status: Doc<'bookings'>['status'];
 	teamList: Id<'users'>[];
+	hostingUser_id: Id<'users'>;
 	side: 'home' | 'away';
 	pitch: Doc<'pitches'>;
 	onJoinTeam: (side: 'home' | 'away', user: Doc<'users'>) => void;
@@ -32,6 +33,7 @@ interface TeamListProps {
 export function TeamList({
 	booking_status,
 	teamList,
+	hostingUser_id,
 	side,
 	pitch,
 	onJoinTeam,
@@ -85,10 +87,22 @@ export function TeamList({
 												.join('')}
 										</AvatarFallback>
 									</Avatar>
-									<span className='flex-1'>
-										{player._id === currUser?._id
-											? 'You'
-											: player.user_name}
+									<span className='flex items-center gap-4 flex-1'>
+										<span>
+											{player._id === currUser?._id
+												? 'You'
+												: player.user_name}
+										</span>
+										{hostingUser_id === player._id && (
+											<span className='w-fit text-xs bg-blue-500 py-1 px-2 rounded-full'>
+												Host
+											</span>
+										)}
+									</span>
+									{/*//TODO: spot status: either "confirmed" or "pending" */}
+									<span
+										className={`w-fit text-xs bg-primary py-1 px-2 rounded-full`}>
+										Pending
 									</span>
 								</div>
 							)

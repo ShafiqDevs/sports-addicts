@@ -52,6 +52,7 @@ function BookingManager({
 				teamB: [],
 				pitch_id: pitch._id,
 				status: 'Available',
+				size: `${pitch.capacity / 2}-a-side` as Doc<'bookings'>['size'],
 			},
 			user.id
 		);
