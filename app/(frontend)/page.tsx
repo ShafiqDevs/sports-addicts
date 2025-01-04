@@ -8,6 +8,7 @@ import FAQSection from '@/components/FAQSection';
 import AboutUsSection from '@/components/AboutUsSection';
 import ContactSection from '@/components/ContactSection';
 import NewsletterSection from '@/components/NewsletterSection';
+import Footer from '@/components/Footer';
 
 export default function Home() {
 	return (
@@ -17,11 +18,12 @@ export default function Home() {
 			<HowItWorksSection />
 			<TestimonialsSection />
 			<BenefitsSection />
-			<PricingSection />
+			{/* <PricingSection /> */}
 			<FAQSection />
 			<AboutUsSection />
 			<ContactSection />
 			<NewsletterSection />
+			
 		</main>
 	);
 }

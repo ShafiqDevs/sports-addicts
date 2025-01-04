@@ -12,7 +12,7 @@ import { ConvexClientProvider } from '@/components/ConvexProviderHelper';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/routes';
 import SyncUserWithConvex from '@/components/SyncUserWithConvex';
-import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import Footer from '@/components/Footer';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -35,7 +35,9 @@ export default function DashboardLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang='en'>
+		<html
+			lang='en'
+			className='scroll-smooth'>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 				<ConvexClientProvider>
@@ -85,12 +87,13 @@ export default function DashboardLayout({
 										</div>
 									</div>
 								</div>
-								<NuqsAdapter>{children}</NuqsAdapter>
+								{children}
 							</div>
 							<SyncUserWithConvex />
 						</ClerkProvider>
 					</ThemeProvider>
 				</ConvexClientProvider>
+				<Footer />
 				<Toaster />
 			</body>
 		</html>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
@@ -8,34 +8,24 @@ import {
 	AvatarFallback,
 	AvatarImage,
 } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import {
 	CalendarIcon,
 	Clock,
 	Users,
-	MapPin,
-	ClockIcon,
 	MapPinIcon,
+	ClockIcon,
 	User,
 } from 'lucide-react';
-import {
-	differenceInHours,
-	format,
-	isToday,
-	isTomorrow,
-} from 'date-fns';
+import { differenceInHours, format } from 'date-fns';
 import { cn, groupedBookingByDateLabel } from '@/lib/utils';
-import { useQueryState } from 'nuqs';
 import { usePathname, useRouter } from 'next/navigation';
-import { Doc } from '@/convex/_generated/dataModel';
-import { BookingList } from './BookingList';
 import { BookingWithUserData } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/routes';
 import { useUser } from '@clerk/nextjs';
+import { v4 as uuidv4 } from 'uuid';
 
-// Mock filters similar to Airbnb's
 const filters = [
 	{ name: 'date', id: 'all', label: 'All Games', icon: Users },
 	{ name: 'date', id: 'today', label: 'Today', icon: CalendarIcon },
@@ -82,14 +72,13 @@ export default function BookingsClient({ bookings }: Props) {
 
 	return (
 		<div className='min-h-screen bg-background relative'>
-			{/* Filters Section */}
 			<div className=' sticky top-0 z-10 bg-background/951 backdrop-blur supports-[backdrop-filter]:bg-background/601'>
 				<div className=' py-4'>
 					<ScrollArea className='w-full whitespace-nowrap'>
 						<div className='flex w-max space-x-4 py-1'>
 							{filters.map((filter) => (
 								<button
-									key={filter.id}
+									key={uuidv4()}
 									onClick={() =>
 										handleFilter(
 											filter.name === 'date'
@@ -99,7 +88,7 @@ export default function BookingsClient({ bookings }: Props) {
 									}
 									className={cn(
 										'inline-flex items-center rounded-full px-4 py-2 text-sm transition-colors',
-										`$${selectedFilter === filter.id ? '' : 'hover:bg-muted'}`,
+										`${selectedFilter === filter.id ? '' : 'hover:bg-muted'}`,
 										selectedFilter === filter.id
 											? 'bg-primary text-primary-foreground'
 											: 'bg-background border border-input'
@@ -114,7 +103,6 @@ export default function BookingsClient({ bookings }: Props) {
 				</div>
 			</div>
 
-			{/* Bookings List */}
 			<div className=' py-6'>
 				<AnimatePresence mode='popLayout'>
 					{bookings.length === 0 ? (
@@ -137,15 +125,16 @@ export default function BookingsClient({ bookings }: Props) {
 									groupedBookingByDateLabel(bookings)
 								).map(([label, bookings], index) => (
 									<div
-										key={`${label}'bookings`}
+										key={uuidv4()}
 										className='w-full flex flex-col gap-1'>
 										<h3 className='text-primary text-sm'>{label}</h3>
 										<div className='flex flex-col gap-2 w-full '>
-											{bookings.map((booking) => {
-												if (!booking.hostingUser) return;
-												return (
-													<AnimatePresence mode='popLayout'>
+											<AnimatePresence mode='popLayout'>
+												{bookings.map((booking) => {
+													if (!booking.hostingUser) return;
+													return (
 														<motion.div
+															key={uuidv4()}
 															initial={{ opacity: 0, y: 20 }}
 															animate={{ opacity: 1, y: 0 }}
 															exit={{ opacity: 0, y: -20 }}
@@ -232,24 +221,24 @@ export default function BookingsClient({ bookings }: Props) {
 																		</div>
 																		<div
 																			className={`px-2.5 py-0.5 rounded-full text-xs font-medium pointer-events-none
-        ${
-					booking.status === 'Available'
-						? 'bg-green-100 text-green-700'
-						: booking.status === 'Booked'
-							? 'bg-blue-100 text-blue-700'
-							: booking.status === 'Cancelled'
-								? 'bg-red-100 text-red-700'
-								: 'bg-gray-100 text-gray-700'
-				}`}>
+		${
+			booking.status === 'Available'
+				? 'bg-green-100 text-green-700'
+				: booking.status === 'Booked'
+					? 'bg-blue-100 text-blue-700'
+					: booking.status === 'Cancelled'
+						? 'bg-red-100 text-red-700'
+						: 'bg-gray-100 text-gray-700'
+		}`}>
 																			{booking.status}
 																		</div>
 																	</div>
 																</div>
 															</Link>
 														</motion.div>
-													</AnimatePresence>
-												);
-											})}
+													);
+												})}
+											</AnimatePresence>
 										</div>
 									</div>
 								))}
