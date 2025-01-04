@@ -20,7 +20,7 @@ export default async function page({ searchParams }: Props) {
 	if (!bookings) return <div>{response.message}</div>;
 	else
 		return (
-			<main className='w-full min-h-screen layoutXPadding overflow-hidden'>
+			<main className='w-full h-full layoutXPadding overflow-hidden'>
 				<BookingsClient bookings={bookings} />
 			</main>
 		);

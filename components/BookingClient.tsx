@@ -81,9 +81,9 @@ export default function BookingsClient({ bookings }: Props) {
 	}
 
 	return (
-		<main className='min-h-screen bg-background'>
+		<div className='min-h-screen bg-background relative'>
 			{/* Filters Section */}
-			<div className='sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
+			<div className=' sticky top-0 z-10 bg-background/951 backdrop-blur supports-[backdrop-filter]:bg-background/601'>
 				<div className='container px-4 py-4'>
 					<ScrollArea className='w-full whitespace-nowrap'>
 						<div className='flex w-max space-x-4 py-1'>
@@ -99,7 +99,7 @@ export default function BookingsClient({ bookings }: Props) {
 									}
 									className={cn(
 										'inline-flex items-center rounded-full px-4 py-2 text-sm transition-colors',
-										'hover:bg-muted',
+										`$${selectedFilter === filter.id ? '' : 'hover:bg-muted'}`,
 										selectedFilter === filter.id
 											? 'bg-primary text-primary-foreground'
 											: 'bg-background border border-input'
@@ -115,7 +115,7 @@ export default function BookingsClient({ bookings }: Props) {
 			</div>
 
 			{/* Bookings List */}
-			<div className='container px-4 py-6'>
+			<div className=' px-4 py-6'>
 				<AnimatePresence mode='popLayout'>
 					{bookings.length === 0 ? (
 						<motion.div
@@ -209,7 +209,7 @@ export default function BookingsClient({ bookings }: Props) {
 																		</div>
 																	</div>
 																</div>
-																<div className='ml-auto flex items-center justify-between w-full'>
+																<div className='ml-auto flex flex-wrap items-center justify-between gap-4 w-full'>
 																	<div className='flex items-center gap-2 text-muted-foreground text-sm'>
 																		<User className='h-4 w-4' />
 																		<span>
@@ -218,14 +218,18 @@ export default function BookingsClient({ bookings }: Props) {
 																			/{booking.pitch?.capacity}
 																		</span>
 																	</div>
-																	<div className='flex gap-2'>
-																		{booking.hostingUser.clerk_id ===
-																			user?.id && (
-																			<div
-																				className={`px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-400 dark:bg-blue-500 pointer-events-none`}>
-																				<span>I&apos;m hosting</span>
-																			</div>
-																		)}
+																	<div className='flex flex-wrap gap-1'>
+																		<div className='flex gap-2'>
+																			{booking.hostingUser
+																				.clerk_id === user?.id && (
+																				<div
+																					className={`px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-400 dark:bg-blue-500 pointer-events-none`}>
+																					<span>
+																						I&apos;m hosting
+																					</span>
+																				</div>
+																			)}
+																		</div>
 																		<div
 																			className={`px-2.5 py-0.5 rounded-full text-xs font-medium pointer-events-none
         ${
@@ -254,6 +258,6 @@ export default function BookingsClient({ bookings }: Props) {
 					)}
 				</AnimatePresence>
 			</div>
-		</main>
+		</div>
 	);
 }
