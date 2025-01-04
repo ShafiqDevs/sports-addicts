@@ -84,7 +84,7 @@ export default function BookingsClient({ bookings }: Props) {
 		<div className='min-h-screen bg-background relative'>
 			{/* Filters Section */}
 			<div className=' sticky top-0 z-10 bg-background/951 backdrop-blur supports-[backdrop-filter]:bg-background/601'>
-				<div className='container px-4 py-4'>
+				<div className=' py-4'>
 					<ScrollArea className='w-full whitespace-nowrap'>
 						<div className='flex w-max space-x-4 py-1'>
 							{filters.map((filter) => (
@@ -115,7 +115,7 @@ export default function BookingsClient({ bookings }: Props) {
 			</div>
 
 			{/* Bookings List */}
-			<div className=' px-4 py-6'>
+			<div className=' py-6'>
 				<AnimatePresence mode='popLayout'>
 					{bookings.length === 0 ? (
 						<motion.div
@@ -127,12 +127,12 @@ export default function BookingsClient({ bookings }: Props) {
 						</motion.div>
 					) : (
 						<Card className='w-full mx-auto'>
-							<CardHeader>
+							<CardHeader className='max-sm:px-3 max-sm:py-3'>
 								<CardTitle className='text-xl font-semibold'>
 									Upcoming Bookings
 								</CardTitle>
 							</CardHeader>
-							<CardContent className='space-y-8 max-h-full overflow-y-auto'>
+							<CardContent className='space-y-8 max-sm:px-3 max-h-full overflow-y-auto'>
 								{Object.entries(
 									groupedBookingByDateLabel(bookings)
 								).map(([label, bookings], index) => (

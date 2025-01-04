@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
 		remotePatterns: [
 			{ hostname: 'placehold.co', protocol: 'https' },
 			{
+				hostname: 'images.unsplash.com',
+				protocol: 'https',
+			},
+			{
 				hostname: 'dapper-mallard-357.convex.cloud',
 				protocol: 'https',
 			},
