@@ -18,7 +18,11 @@ import {
 } from 'lucide-react';
 import { differenceInHours, format } from 'date-fns';
 import { cn, groupedBookingByDateLabel } from '@/lib/utils';
-import { usePathname, useRouter } from 'next/navigation';
+import {
+	usePathname,
+	useRouter,
+	useSearchParams,
+} from 'next/navigation';
 import { BookingWithUserData } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import Link from 'next/link';
@@ -46,10 +50,15 @@ type searchParamsObject = {
 };
 
 export default function BookingsClient({ bookings }: Props) {
-	const [selectedFilter, setSelectedFilter] = useState('all');
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const date = searchParams.get('date');
+	const size = searchParams.get('size');
 	const pathName = usePathname();
 	const { user } = useUser();
+	const [selectedFilter, setSelectedFilter] = useState(
+		date || size || 'all'
+	);
 
 	function handleFilter(filter_item: searchParamsObject) {
 		const searchParams = new URLSearchParams();

@@ -61,6 +61,14 @@ export const getBookingsByFilter = query({
 			if (date === 'all') {
 				const filteredBookings = await ctx.db
 					.query('bookings')
+					.withIndex('byBookingStart')
+					.filter((q) =>
+						q.and(
+							q.neq(q.field('status'), 'Cancelled'),
+							q.neq(q.field('status'), 'Completed')
+						)
+					)
+					.order('desc')
 					.collect();
 				bookings = await Promise.all(
 					filteredBookings.map(async (filteredBooking, index) => {
@@ -74,12 +82,18 @@ export const getBookingsByFilter = query({
 			} else if (date === 'today') {
 				const filteredBookings = await ctx.db
 					.query('bookings')
+					.withIndex('byBookingStart')
 					.filter((q) =>
 						q.and(
 							q.gte(q.field('booking_start'), today),
-							q.lte(q.field('booking_start'), endToday)
+							q.lte(q.field('booking_start'), endToday),
+							q.and(
+								q.neq(q.field('status'), 'Cancelled'),
+								q.neq(q.field('status'), 'Completed')
+							)
 						)
 					)
+					.order('desc')
 					.collect();
 				bookings = await Promise.all(
 					filteredBookings.map(async (filteredBooking, index) => {
@@ -93,12 +107,18 @@ export const getBookingsByFilter = query({
 			} else if (date === 'tomorrow') {
 				const filteredBookings = await ctx.db
 					.query('bookings')
+					.withIndex('byBookingStart')
 					.filter((q) =>
 						q.and(
 							q.gte(q.field('booking_start'), tomorrow),
-							q.lte(q.field('booking_start'), endTomorrow)
+							q.lte(q.field('booking_start'), endTomorrow),
+							q.and(
+								q.neq(q.field('status'), 'Cancelled'),
+								q.neq(q.field('status'), 'Completed')
+							)
 						)
 					)
+					.order('desc')
 					.collect();
 				bookings = await Promise.all(
 					filteredBookings.map(async (filteredBooking, index) => {
@@ -115,7 +135,17 @@ export const getBookingsByFilter = query({
 		else if (size) {
 			const filteredBookings = await ctx.db
 				.query('bookings')
-				.filter((q) => q.eq(q.field('size'), size))
+				.withIndex('byBookingStart')
+				.filter((q) =>
+					q.and(
+						q.eq(q.field('size'), size),
+						q.and(
+							q.neq(q.field('status'), 'Cancelled'),
+							q.neq(q.field('status'), 'Completed')
+						)
+					)
+				)
+				.order('desc')
 				.collect();
 			bookings = await Promise.all(
 				filteredBookings.map(async (filteredBooking, index) => {
@@ -129,6 +159,14 @@ export const getBookingsByFilter = query({
 		} else {
 			const filteredBookings = await ctx.db
 				.query('bookings')
+				.withIndex('byBookingStart')
+				.filter((q) =>
+					q.and(
+						q.neq(q.field('status'), 'Cancelled'),
+						q.neq(q.field('status'), 'Completed')
+					)
+				)
+				.order('desc')
 				.collect();
 			bookings = await Promise.all(
 				filteredBookings.map(async (filteredBooking, index) => {

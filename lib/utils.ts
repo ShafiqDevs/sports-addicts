@@ -8,7 +8,6 @@ import {
 	differenceInDays,
 } from 'date-fns';
 
-
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
@@ -36,18 +35,21 @@ export function groupedBookingByDateLabel(
 		console.log(
 			`${new Date()} | ${new Date(booking.booking_start)} -> dayDifference:${dayDifference}`
 		);
-
-		const label =
-			dayDifference === 0
-				? 'Today'
-				: dayDifference === 1
-					? 'Tomorrow'
-					: /// if the dayDifference is less than 0, it means the booking is in the future
-						dayDifference < 0
-						? dayDifference === -1
-							? `Tomorrow`
-							: `In ${Math.abs(dayDifference)} days`
-						: `${Math.abs(dayDifference)} days ago`;
+		let label;
+		// if the dayDifference is greater than 0, it means the booking is in the past
+		if (dayDifference > 0) {
+			label =
+				dayDifference === 1
+					? `Yesterday`
+					: `${dayDifference} ${dayDifference > 1 ? 'days' : 'day'} ago`;
+		}
+		// if the dayDifference is less than 0, it means the booking is in the future
+		else if (dayDifference < 0) {
+			label =
+				dayDifference === -1
+					? `Tomorrow`
+					: `In ${Math.abs(dayDifference)} days`;
+		} else label = 'Today';
 
 		if (!groupedBookings[label]) groupedBookings[label] = [];
 		groupedBookings[label].push(booking);

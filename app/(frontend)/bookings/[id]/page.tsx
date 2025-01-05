@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { CalendarIcon, MapPinIcon, Clock } from 'lucide-react';
 import {
@@ -23,8 +23,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useUser } from '@clerk/nextjs';
 import { v4 as uuidv4 } from 'uuid';
 import Loader from '@/components/Loader';
-import { Button } from '@/components/ui/button';
 import { cancelBooking } from '@/actions/bookingRequests';
+import { CancelBookingDialog } from '@/components/CancelBookingDialog';
 type Props = {
 	params: Promise<{ id: string }>;
 };
@@ -33,18 +33,8 @@ export default function BookingDetailsPage({ params }: Props) {
 	const { id } = useParams<{ id: string }>();
 	const [isClient, setIsClient] = useState(false);
 	const [isJoinPending, setIsJoinPending] = useState(false);
-	const [_, cancelBookingAction, isBookingCancellationPending] =
-		useActionState(
-			async () =>
-				handleCancelBooking(
-					booking?._id as string,
-					currUser?._id as string
-				),
-			null
-		);
 	const { toast } = useToast();
 	const { user, isSignedIn, isLoaded } = useUser();
-	if (!user || !isSignedIn || !isLoaded) redirect('/login');
 
 	const booking = useQuery(api.bookings.getBookingById, {
 		booking_id: id as Id<'bookings'>,
@@ -281,7 +271,7 @@ export default function BookingDetailsPage({ params }: Props) {
 										<time
 											dateTime={new Date(
 												booking.booking_start
-											).toISOString()}>
+											).toString()}>
 											{format(
 												booking.booking_start,
 												'EEEE, MMMM d, yyyy'
@@ -326,16 +316,32 @@ export default function BookingDetailsPage({ params }: Props) {
 											</span>
 										</div>
 									</div>
-									{isHost && (
-										<Button
-											disabled={isBookingCancellationPending}
-											className=''
-											variant={'destructive'}
-											onClick={cancelBookingAction}>
-											{isBookingCancellationPending
-												? '1 sec...'
-												: 'Cancel Booking'}
-										</Button>
+									{isHost && booking.status === 'Available' && (
+										// <Button
+										// 	disabled={isBookingCancellationPending}
+										// 	className=''
+										// 	variant={'destructive'}
+										// 	onClick={cancelBookingAction}>
+										// 	{isBookingCancellationPending
+										// 		? '1 sec...'
+										// 		: 'Cancel Booking'}
+										// </Button>
+										<CancelBookingDialog
+											booking={{
+												date: new Date(
+													booking.booking_start
+												).toString(),
+												hostName: isHost ? 'You' : host.user_name,
+												location: pitch.address,
+												status: booking.status,
+												time: new Date(
+													booking.booking_start
+												).toString(),
+												title: 'Football Match',
+											}}
+											booking_id={booking._id}
+											currUser_id={currUser?._id}
+										/>
 									)}
 								</div>
 							</div>
