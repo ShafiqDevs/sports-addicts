@@ -77,10 +77,10 @@ export default async function PlayPage({ searchParams }: Props) {
 
 	return (
 		<main className='w-full h-full layoutXPadding overflow-hidden'>
-			<h1>Welcome to Sports Addicts!</h1>
+			{/* <h1>Welcome to Sports Addicts!</h1> */}
 			{/* Filters Section */}
-			<div className=' sticky top-0 z-10 bg-background/951 backdrop-blur supports-[backdrop-filter]:bg-background/601 overflow-x-auto'>
-				<div className='container px-4 py-4'>
+			<div className=' sticky top-0 w-full mb-8 z-10 bg-background/951 backdrop-blur supports-[backdrop-filter]:bg-background/601 overflow-x-auto'>
+				<div className='w-full px-4 py-4'>
 					<ScrollArea className='w-full whitespace-nowrap'>
 						<div className='flex w-max space-x-4 py-1'>
 							{filters.map((filter) => (

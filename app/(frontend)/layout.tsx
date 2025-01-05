@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { ROUTES } from '@/lib/routes';
 import SyncUserWithConvex from '@/components/SyncUserWithConvex';
 import Footer from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -47,7 +48,9 @@ export default function DashboardLayout({
 						enableSystem
 						disableTransitionOnChange>
 						<ClerkProvider dynamic>
-							<div className='w-full '>
+							<Navbar />
+							{children}
+							{/* <div className='w-full '>
 								<div className='sticky top-0 w-full navBarheight  flex flex-row justify-end items-center bg-card layoutXPadding py-4 z-[99] border-b border-border '>
 									<div className='w-full flex flex-col md:flex-row items-center justify-between gap-8'>
 										<span className='text-2xl md:text-4xl text-primary font-bold whitespace-nowrap '>
@@ -87,8 +90,8 @@ export default function DashboardLayout({
 										</div>
 									</div>
 								</div>
-								{children}
-							</div>
+								
+							</div> */}
 							<SyncUserWithConvex />
 						</ClerkProvider>
 					</ThemeProvider>

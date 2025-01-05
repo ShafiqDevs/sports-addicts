@@ -12,7 +12,7 @@ import Footer from '@/components/Footer';
 
 export default function Home() {
 	return (
-		<main className='w-full flex flex-col items-center justify-center '>
+		<main className='w-full h-full flex flex-col items-center justify-center '>
 			<HeroSection />
 			<FeaturesSection />
 			<HowItWorksSection />

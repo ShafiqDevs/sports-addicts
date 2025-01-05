@@ -67,7 +67,7 @@ export default function Footer() {
 	};
 
 	return (
-		<footer className='w-full bg-background border-t'>
+		<footer className='w-full bg-background border-t mt-36'>
 			<div className='container mx-auto px-6 py-12 h-full'>
 				<div className='grid grid-cols-1 md:grid-cols-4 gap-8'>
 					<div className='space-y-4'>
@@ -114,7 +114,7 @@ export default function Footer() {
 				</div>
 				<div className='mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center'>
 					<p className='text-muted-foreground text-sm'>
-						© 2023 PitchPerfect. All rights reserved.
+						© 2024 PitchPerfect. All rights reserved.
 					</p>
 					<div className='flex space-x-4 mt-4 md:mt-0'>
 						{socialLinks.map((link) => (

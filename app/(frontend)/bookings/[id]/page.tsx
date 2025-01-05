@@ -249,7 +249,7 @@ export default function BookingDetailsPage({ params }: Props) {
 	}
 
 	return (
-		<div className='container mx-auto py-10 space-y-8'>
+		<div className='w-full h-full mb-8 layoutXPadding mx-auto py-10 space-y-8'>
 			{booking && pitch && host && (
 				<Card>
 					<CardContent className='p-6'>

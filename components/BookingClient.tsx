@@ -71,7 +71,7 @@ export default function BookingsClient({ bookings }: Props) {
 	}
 
 	return (
-		<div className='min-h-screen bg-background relative'>
+		<div className='w-full h-full bg-background relative'>
 			<div className=' sticky top-0 z-10 bg-background/951 backdrop-blur supports-[backdrop-filter]:bg-background/601'>
 				<div className=' py-4'>
 					<ScrollArea className='w-full whitespace-nowrap'>

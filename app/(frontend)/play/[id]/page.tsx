@@ -70,9 +70,9 @@ export default async function PitchPage({
 	);
 
 	return (
-		<main className='relative w-full min-h-screen layoutXPadding overflow-hidden'>
+		<main className='relative w-full h-full mb-8 layoutXPadding overflow-hidden'>
 			{/* SVG Shapes */}
-			<div className='absolute inset-0 pointer-events-none z-0'>
+			{/* <div className='absolute inset-0 pointer-events-none z-0'>
 				<svg
 					className='absolute top-0 left-0 w-1/3 h-auto text-primary/10'
 					viewBox='0 0 200 200'
@@ -93,7 +93,7 @@ export default async function PitchPage({
 						transform='translate(100 100)'
 					/>
 				</svg>
-			</div>
+			</div> */}
 			{/* Header */}
 			<div className=' bg- flex justify-between items-center py-6'>
 				<h1 className='text-2xl font-medium'>{pitch.name}</h1>
