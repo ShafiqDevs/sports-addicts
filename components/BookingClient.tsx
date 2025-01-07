@@ -29,6 +29,7 @@ import Link from 'next/link';
 import { ROUTES } from '@/lib/routes';
 import { useUser } from '@clerk/nextjs';
 import { v4 as uuidv4 } from 'uuid';
+import NoBookingsUI from './NoBookingsUI';
 
 const filters = [
 	{ name: 'date', id: 'all', label: 'All Games', icon: Users },
@@ -120,7 +121,7 @@ export default function BookingsClient({ bookings }: Props) {
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -20 }}
 							className='text-center py-12 text-muted-foreground'>
-							No bookings found for the selected filter.
+							<NoBookingsUI withAction />
 						</motion.div>
 					) : (
 						<Card className='w-full mx-auto'>

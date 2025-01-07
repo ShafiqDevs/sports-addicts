@@ -1,23 +1,25 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import {
+	motion,
+	AnimatePresence,
+	useAnimation,
+	useMotionValue,
+} from 'framer-motion';
 import {
 	Users,
 	MapPin,
 	ChevronLeft,
 	ChevronRight,
+	Star,
+	Calendar,
 } from 'lucide-react';
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/routes';
-import Loader from './Loader';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
@@ -28,9 +30,9 @@ interface PitchCardProps {
 	capacity: number;
 	address: string;
 	images: Id<'_storage'>[];
+	rating: number;
+	nextAvailable?: string;
 }
-
-const CAROUSELL_TIMER = 7000;
 
 export function PitchCard({
 	_id,
@@ -38,115 +40,140 @@ export function PitchCard({
 	capacity,
 	address,
 	images: imageIDs,
+	rating,
+	nextAvailable,
 }: PitchCardProps) {
-	const [currentImageIndex, setCurrentImageIndex] = useState(0);
+	const [currentIndex, setCurrentIndex] = useState(0);
 	const [isHovered, setIsHovered] = useState(false);
-	const [isClient, setIsClient] = useState(false);
+	const constraintsRef = useRef(null);
+	const x = useMotionValue(0);
+	const controls = useAnimation();
+
 	const images = useQuery(api.files.getFiles, {
 		storageIds: imageIDs,
 	});
 
 	useEffect(() => {
-		if (!isHovered && images && images.length > 1) {
-			const timer = setInterval(() => {
-				setCurrentImageIndex((prev) => (prev + 1) % images.length);
-			}, CAROUSELL_TIMER);
-			return () => clearInterval(timer);
-		}
+		const interval = setInterval(() => {
+			if (!isHovered && images) {
+				setCurrentIndex(
+					(prevIndex) => (prevIndex + 1) % images.length
+				);
+			}
+		}, 5000);
+
+		return () => clearInterval(interval);
 	}, [isHovered, images]);
 
-	const formatCapacity = (capacity: number) => {
-		const perSide = capacity / 2;
-		return `${perSide}-a-side`;
+	const handleDragEnd = (event: any, info: any) => {
+		const threshold = 50;
+		if (info.offset.x > threshold && images) {
+			setCurrentIndex(
+				(prevIndex) => (prevIndex - 1 + images.length) % images.length
+			);
+		} else if (info.offset.x < -threshold && images) {
+			setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+		}
+		controls.start({ x: 0 });
 	};
 
-	useEffect(() => {
-		setIsClient(true);
-	}, []);
-	if (!isClient) return <Loader />;
+	const formatCapacity = (capacity: number) =>
+		`${capacity / 2}-a-side`;
+
+	if (!images) return null;
 
 	return (
-		<Card className='w-full h-full max-w-md overflow-hidden bg-background'>
+		<Card className=' col-span-1 w-full overflow-hidden group'>
 			<div
-				className='relative aspect-video'
+				className='relative aspect-[4/3] overflow-hidden'
 				onMouseEnter={() => setIsHovered(true)}
-				onMouseLeave={() => setIsHovered(false)}>
-				<AnimatePresence
-					initial={false}
-					mode='wait'>
-					{images && (
-						<motion.img
-							key={currentImageIndex}
-							src={images[currentImageIndex]}
-							alt={`${name} - View ${currentImageIndex + 1}`}
-							className='absolute inset-0 w-full h-full object-cover'
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							exit={{ opacity: 0 }}
-							transition={{ duration: 0.5 }}
-						/>
-					)}
+				onMouseLeave={() => setIsHovered(false)}
+				ref={constraintsRef}>
+				<AnimatePresence initial={false}>
+					<motion.img
+						key={currentIndex}
+						src={images[currentIndex]}
+						alt={`${name} - View ${currentIndex + 1}`}
+						className='absolute inset-0 w-full h-full object-cover'
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						transition={{ duration: 0.5 }}
+						drag='x'
+						dragConstraints={constraintsRef}
+						dragElastic={0.2}
+						onDragEnd={handleDragEnd}
+					/>
 				</AnimatePresence>
-				{images && images.length > 1 && (
+				<div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent' />
+
+				<div className='absolute top-2 left-2 flex gap-2'>
+					<Badge
+						variant='secondary'
+						className='bg-black/50 text-white'>
+						<Users className='w-3 h-3 mr-1' />
+						{formatCapacity(capacity)}
+					</Badge>
+					<Badge
+						variant='secondary'
+						className='bg-primary/80 text-primary-foreground'>
+						<Star className='w-3 h-3 mr-1' />
+						{rating.toFixed(1)}
+					</Badge>
+				</div>
+
+				<div className='absolute bottom-2 left-2 right-2 flex justify-between items-end'>
+					<div>
+						<h3 className='text-lg font-semibold text-white mb-1'>
+							{name}
+						</h3>
+						<p className='text-sm text-white/80 flex items-center'>
+							<MapPin className='w-3 h-3 mr-1' />
+							{address}
+						</p>
+					</div>
+					{/* <Badge
+						variant='secondary'
+						className='bg-black/50 text-white'>
+						<Calendar className='w-3 h-3 mr-1' />
+						{nextAvailable}
+					</Badge> */}
+				</div>
+
+				{images.length > 1 && (
 					<>
-						<button
+						<Button
+							size='icon'
+							variant='ghost'
+							className='absolute top-1/2 left-2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity'
 							onClick={() =>
-								setCurrentImageIndex(
-									(prev) => (prev - 1 + images.length) % images.length
+								setCurrentIndex(
+									(prevIndex) =>
+										(prevIndex - 1 + images.length) % images.length
 								)
-							}
-							className='absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/80 text-foreground hover:bg-background/90 transition-colors'
-							aria-label='Previous image'>
-							<ChevronLeft className='h-3 w-3' />
-						</button>
-						<button
+							}>
+							<ChevronLeft className='w-4 h-4' />
+						</Button>
+						<Button
+							size='icon'
+							variant='ghost'
+							className='absolute top-1/2 right-2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity'
 							onClick={() =>
-								setCurrentImageIndex(
-									(prev) => (prev + 1) % images.length
+								setCurrentIndex(
+									(prevIndex) => (prevIndex + 1) % images.length
 								)
-							}
-							className='absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/80 text-foreground hover:bg-background/90 transition-colors'
-							aria-label='Next image'>
-							<ChevronRight className='h-3 w-3' />
-						</button>
-						<div className='absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1'>
-							{images.map((_, index) => (
-								<button
-									key={index}
-									onClick={() => setCurrentImageIndex(index)}
-									className={`w-2 h-2 rounded-full transition-colors ${
-										index === currentImageIndex
-											? 'bg-primary'
-											: 'bg-background/80'
-									}`}
-									aria-label={`Go to image ${index + 1}`}
-								/>
-							))}
-						</div>
+							}>
+							<ChevronRight className='w-4 h-4' />
+						</Button>
 					</>
 				)}
 			</div>
-			<CardHeader>
-				<CardTitle className='flex items-center justify-between'>
-					<Link
-						href={`${ROUTES.play}/${_id}`}
-						className='flex flex-col md:flex-row items-center justify-between w-full'>
-						<span>{name}</span>
-						<Badge
-							variant='secondary'
-							className='flex items-center gap-1 shrink-0'>
-							<Users className='h-4 w-4' />
-							{formatCapacity(capacity)}
-						</Badge>
-					</Link>
-				</CardTitle>
-			</CardHeader>
-			<CardContent>
+
+			<CardContent className='p-4'>
 				<Link
 					href={`${ROUTES.play}/${_id}`}
-					className='flex items-start gap-2 text-muted-foreground'>
-					<MapPin className='h-4 w-4 mt-1 shrink-0' />
-					<p className='text-sm line-clamp-2'>{address}</p>
+					className='block w-full'>
+					<Button className='w-full'>Book Now</Button>
 				</Link>
 			</CardContent>
 		</Card>

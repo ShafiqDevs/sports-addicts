@@ -1,9 +1,6 @@
 import Image from 'next/image';
 import { Share, Heart } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import DateTimePicker from '@/components/DateTimePicker';
 import FramerCarousell from '@/components/FramerCarousell';
-import { BookingList } from '@/components/BookingList';
 import { convex } from '@/lib/utils';
 import { api } from '@/convex/_generated/api';
 import { Doc, Id } from '@/convex/_generated/dataModel';

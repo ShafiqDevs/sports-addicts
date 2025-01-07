@@ -2,9 +2,10 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Smartphone } from 'lucide-react';
+import { ROUTES } from '@/lib/routes';
 
 export function DesktopPrompt() {
-	const appUrl = 'https://localhost:3000/install'; // Replace with your actual app URL
+	const appUrl = ROUTES.appUrl;
 
 	return (
 		<div className='container mx-auto px-4 py-16 max-w-2xl text-center'>

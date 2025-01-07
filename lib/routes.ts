@@ -7,4 +7,7 @@ export const ROUTES = {
 	support: `/support`,
 	play: `/play`,
 	bookings: `/bookings`,
+	install: `/install`,
+	settings: `/settings`,
+	appUrl: `${`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` || process.env.NEXT_PUBLIC_BASE_URL}/`,
 };

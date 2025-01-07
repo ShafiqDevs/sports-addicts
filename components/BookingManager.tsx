@@ -186,10 +186,7 @@ function BookingManager({
 					</p>
 				</div>
 				<div className='w-full'>
-					<BookingList
-						//TODO: fix the bookingList component
-						bookings={bookings}
-					/>
+					<BookingList bookings={bookings} />
 				</div>
 			</div>
 

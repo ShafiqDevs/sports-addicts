@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
 	CalendarIcon,
+	CalendarPlus,
 	ClockIcon,
 	MapPinIcon,
 	MoreHorizontal,
@@ -37,6 +38,7 @@ import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/routes';
 import { motion, AnimatePresence } from 'framer-motion';
+import NoBookingsUI from './NoBookingsUI';
 
 interface BookingListProps {
 	bookings: BookingWithUserData[];
@@ -44,8 +46,7 @@ interface BookingListProps {
 
 export function BookingList({ bookings }: BookingListProps) {
 	if (!bookings || bookings.length < 1) {
-		//TODO: add a proper UI for this case
-		return <p>No Bookings for now </p>;
+		return <NoBookingsUI withAction={false} />;
 	}
 
 	const { user } = useUser();
