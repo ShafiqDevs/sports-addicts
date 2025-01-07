@@ -56,6 +56,11 @@ export function Navbar() {
 								className='text-sm font-medium transition-colors hover:text-primary'>
 								Settings
 							</Link>
+							<Link
+								href='/install'
+								className='text-sm font-medium transition-colors hover:text-primary'>
+								install
+							</Link>
 						</nav>
 					</SheetContent>
 				</Sheet>
