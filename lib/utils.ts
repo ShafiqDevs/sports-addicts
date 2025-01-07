@@ -1,7 +1,10 @@
 import { clsx, type ClassValue } from 'clsx';
 import { ConvexHttpClient } from 'convex/browser';
 import { twMerge } from 'tailwind-merge';
-import { BookingWithUserData } from './types';
+import {
+	BookingWithUserData,
+	NotificationSubscriptionObject,
+} from './types';
 import {
 	compareAsc,
 	differenceInCalendarDays,
@@ -56,4 +59,41 @@ export function groupedBookingByDateLabel(
 	});
 
 	return groupedBookings;
+}
+
+export function urlBase64ToUint8Array(base64String: string) {
+	const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+	const base64 = (base64String + padding)
+		.replace(/-/g, '+')
+		.replace(/_/g, '/');
+
+	const rawData = window.atob(base64);
+	const outputArray = new Uint8Array(rawData.length);
+
+	for (let i = 0; i < rawData.length; ++i) {
+		outputArray[i] = rawData.charCodeAt(i);
+	}
+	return outputArray;
+}
+
+export function CunstructSubscriptionCustomObject(
+	vapidSubscription: PushSubscription
+) {
+	const serializedSub = JSON.parse(JSON.stringify(vapidSubscription));
+	let CustomSubObj: NotificationSubscriptionObject = {
+		[serializedSub.keys.auth]: serializedSub,
+	};
+	return {
+		CustomSubObj,
+		serializedSub,
+		vapidSubscriptionKey: serializedSub.keys.auth,
+	};
+}
+
+export function convertCustomSubObjectToVapidSub(
+	customSubObj: NotificationSubscriptionObject
+) {
+	return customSubObj[
+		Object.keys(customSubObj)[0]
+	] as any as PushSubscription;
 }

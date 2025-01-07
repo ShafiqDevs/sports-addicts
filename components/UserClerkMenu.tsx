@@ -22,7 +22,7 @@ function UserClerkMenu({}: Props) {
 				</Button>
 			</SignedOut>
 			<SignedIn>
-				<UserButton />
+				<UserButton  />
 			</SignedIn>
 		</div>
 	);
