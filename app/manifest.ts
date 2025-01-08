@@ -2,9 +2,9 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
 	return {
-		name: 'Next.js PWA',
-		short_name: 'NextPWA',
-		description: 'A Progressive Web App built with Next.js',
+		name: 'Sports Addicts',
+		short_name: 'SportsAddicts',
+		description: 'Book your perfect football pitch with Sports Addicts',
 		start_url: '/',
 		display: 'standalone',
 		background_color: '#ffffff',
