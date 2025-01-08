@@ -30,6 +30,7 @@ import {
 import { NotificationSubscriptionObject } from '@/lib/types';
 import { STATUS_CODES } from '@/lib/statusCodes';
 import { useToast } from '@/hooks/use-toast';
+import { useTheme } from 'next-themes';
 
 export default function SettingsPage() {
 	const [isClient, setIsClient] = useState(false);
@@ -39,6 +40,7 @@ export default function SettingsPage() {
 		useState<PushSubscription | null>(null);
 	const [message, setMessage] = useState('');
 	const { toast } = useToast();
+	const { theme, setTheme } = useTheme();
 
 	let currUser = useQuery(api.users.getUserByAuthId, {
 		auth_id: user?.id,
@@ -255,7 +257,13 @@ export default function SettingsPage() {
 							<Label htmlFor='dark-mode'>Dark Mode</Label>
 						</div>
 
-						<Switch id='notifications' />
+						<Switch
+							checked={theme === 'dark' ? true : false}
+							onCheckedChange={(checked) =>
+								checked ? setTheme('dark') : setTheme('light')
+							}
+							id='themeSwitch'
+						/>
 					</div>
 				</CardContent>
 			</Card>

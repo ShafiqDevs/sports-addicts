@@ -28,7 +28,9 @@ const features = [
 
 export default function FeaturesSection() {
 	return (
-		<section id='features-section' className='w-full py-12 md:py-24 lg:py-32 layoutXPadding'>
+		<section
+			id='features-section'
+			className='w-full py-12 md:py-24 lg:py-32 layoutXPadding'>
 			<div className='container px-4 md:px-6'>
 				<h2 className='text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-12'>
 					Key Features
@@ -58,14 +60,14 @@ export default function FeaturesSection() {
 					</div>
 					<div className='grid grid-cols-2 gap-4'>
 						<Image
-							src='https://placehold.co/300x600/png'
+							src='/mobile_mockup_1.png'
 							alt='App screenshot 1'
 							width={300}
 							height={600}
 							className='rounded-lg shadow-md'
 						/>
 						<Image
-							src='https://placehold.co/300x600/png'
+							src='/mobile_mockup_2.png'
 							alt='App screenshot 2'
 							width={300}
 							height={600}

@@ -18,6 +18,7 @@ import {
 	SignInButton,
 	SignOutButton,
 } from '@clerk/nextjs';
+import SearchBar from './SearchBar';
 
 export function Navbar() {
 	return (
@@ -146,16 +147,7 @@ export function Navbar() {
 					</Link>
 				</nav>
 				<div className='flex flex-1 items-center justify-end gap-2'>
-					<form className='hidden w-full max-w-sm lg:flex'>
-						<div className='relative'>
-							<Search className='absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground' />
-							<Input
-								type='search'
-								placeholder='Search for lobbies...'
-								className='w-full appearance-none bg-background pl-8 shadow-none md:w-[300px]'
-							/>
-						</div>
-					</form>
+					<SearchBar />
 					{/* theme switch */}
 					<ThemeSwitch />
 					<UserClerkMenu />

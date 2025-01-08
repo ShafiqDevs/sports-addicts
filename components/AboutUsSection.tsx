@@ -2,7 +2,9 @@ import Image from 'next/image';
 
 export default function AboutUsSection() {
 	return (
-		<section id='about-us' className='w-full py-12 md:py-24 lg:py-32 layoutXPadding bg-secondary'>
+		<section
+			id='about-us'
+			className='w-full py-12 md:py-24 lg:py-32 layoutXPadding bg-secondary'>
 			<div className='container px-4 md:px-6'>
 				<div className='grid grid-cols-1 md:grid-cols-2 gap-6 items-center'>
 					<div>
@@ -26,7 +28,7 @@ export default function AboutUsSection() {
 					</div>
 					<div className='flex justify-center'>
 						<Image
-							src='https://placehold.co/400x400/png'
+							src='/who_we_are.jpg'
 							alt='Our Team'
 							width={400}
 							height={400}

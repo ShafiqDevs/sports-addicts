@@ -2,6 +2,7 @@ import Form from 'next/form';
 import { Search } from 'lucide-react';
 import { Button } from './ui/button';
 import { x } from '@/actions/search';
+import { Input } from './ui/input';
 
 type Props = {};
 
@@ -9,19 +10,14 @@ function SearchBar({}: Props) {
 	return (
 		<Form
 			action={x}
-			className='flex flex-col md:flex-row items-center justify-center gap-2'>
-			<div className='flex flex-row justify-between border border-border py-1 pr-2 pl-4 rounded-full w-full md:w-60 '>
-				<input
-					className='outline-none bg-transparent w-full text-sm'
-					type='text'
-					placeholder='Search for lobbies...'
+			className='hidden w-full max-w-sm lg:flex'>
+			<div className='relative'>
+				<Search className='absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground' />
+				<Input
+					type='search'
+					placeholder='Find a game...'
+					className='w-full appearance-none bg-background pl-8 shadow-none md:w-[300px]'
 				/>
-
-				<Button
-					className='hidden md:flex items-center justify-center rounded-full p-2 aspect-square '
-					variant={'default'}>
-					<Search />
-				</Button>
 			</div>
 		</Form>
 	);
