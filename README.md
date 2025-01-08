@@ -4,6 +4,9 @@
 
 **Sports Addicts** is a cutting-edge web application designed to revolutionize the way football enthusiasts connect, organize, and play their favorite sport. It offers a seamless and real-time booking experience for football pitches, enabling users to join games, select teams, and organize matches with unparalleled ease. The app leverages modern technologies to deliver a powerful, responsive, and feature-rich platform suitable for both casual players and seasoned athletes.
 
+## Live Preview
+[View Sports Addicts Live](https://sports-addicts.vercel.app/)
+
 ## Core Features
 
 ### Real-Time Booking
