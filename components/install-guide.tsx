@@ -27,7 +27,6 @@ const steps = [
 ];
 
 export function InstallGuide() {
-
 	return (
 		<div className='container mx-auto px-4 py-16 max-w-4xl'>
 			<h1 className='text-4xl font-bold text-center mb-8'>
@@ -67,14 +66,7 @@ export function InstallGuide() {
 					</div>
 				))}
 			</div>
-			<div className='mt-16 text-center'>
-				<Button
-					size='lg'
-					className='text-lg px-8'
-					onClick={handleInstall}>
-					Open Sports Addicts in Safari
-				</Button>
-			</div>
+			<div className='mt-16 text-center'></div>
 		</div>
 	);
 }

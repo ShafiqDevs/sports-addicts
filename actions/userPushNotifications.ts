@@ -110,3 +110,11 @@ export async function sendNotification(
 		};
 	}
 }
+
+export async function internalCall_sendNotification(
+	user_id: Id<'users'>,
+	data: string
+) {
+	const response = await sendNotification(user_id, data);
+	return response;
+}

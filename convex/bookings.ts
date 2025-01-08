@@ -5,7 +5,7 @@ import {
 	query,
 } from './_generated/server';
 import { STATUS_CODES } from '@/lib/statusCodes';
-import { internal } from './_generated/api';
+import { api, internal } from './_generated/api';
 import {
 	compareAsc,
 	differenceInMinutes,
@@ -17,6 +17,7 @@ import {
 import { JOIN_CUTOFF_MINUTES } from '@/lib/constants';
 import { Doc } from './_generated/dataModel';
 import { BookingWithUserData } from '@/lib/types';
+import { sendNotification } from '@/actions/userPushNotifications';
 
 export const getAllBookings = query({
 	args: {},
@@ -367,6 +368,17 @@ export const cancelBooking = mutation({
 					status: STATUS_CODES.UNAUTHORIZED,
 				};
 			await ctx.db.patch(booking_id, { status: 'Cancelled' });
+			ctx.scheduler.runAfter(
+				0,
+				api.actions.sendNotificationFromConvex,
+				{
+					user_id,
+					notification: {
+						title: 'Booking Cancelled',
+						body: 'Your booking has been cancelled',
+					},
+				}
+			);
 			return {
 				message: 'Booking cancelled successfully',
 				data: booking,
