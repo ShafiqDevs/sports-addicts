@@ -47,4 +47,9 @@ export default defineSchema({
 		), // Available, Booked, Cancelled, Completed
 		// Other fields here...
 	}).index('byBookingStart', ['booking_start']),
+	waitinglist: defineTable({
+		user_id: v.id('users'),
+		booking: v.id('bookings'),
+		// Other fields here...
+	}),
 });

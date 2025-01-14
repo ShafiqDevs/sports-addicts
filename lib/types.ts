@@ -5,7 +5,6 @@ export type BookingWithUserData = Doc<'bookings'> & {
 	pitch: Doc<'pitches'> | null;
 };
 
-
 export type NotificationSubscriptionObject = {
 	[key: string]: {
 		endpoint: string;
@@ -15,4 +14,8 @@ export type NotificationSubscriptionObject = {
 			auth: string;
 		};
 	};
+};
+
+export type WaitingListWithUserData = Doc<'waitinglist'> & {
+	user: Doc<'users'> | null;
 };

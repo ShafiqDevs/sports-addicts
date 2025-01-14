@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { TeamList } from '@/components/TeamList';
+import { WaitingList } from '@/components/WaitingList';
 import Image from 'next/image';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
@@ -25,6 +26,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Loader from '@/components/Loader';
 import { cancelBooking } from '@/actions/bookingRequests';
 import { CancelBookingDialog } from '@/components/CancelBookingDialog';
+
 type Props = {
 	params: Promise<{ id: string }>;
 };
@@ -33,6 +35,8 @@ export default function BookingDetailsPage({ params }: Props) {
 	const { id } = useParams<{ id: string }>();
 	const [isClient, setIsClient] = useState(false);
 	const [isJoinPending, setIsJoinPending] = useState(false);
+	const [isWaitingListPending, setIsWaitingListPending] =
+		useState(false);
 	const { toast } = useToast();
 	const { user, isSignedIn, isLoaded } = useUser();
 
@@ -55,9 +59,19 @@ export default function BookingDetailsPage({ params }: Props) {
 	const currUser = useQuery(api.users.getUserByAuthId, {
 		auth_id: user?.id!,
 	});
+	const waitingList = useQuery(
+		api.waitinglist.getBookingWaitingList,
+		{ booking_id: booking?._id }
+	);
 
 	const joinTeam = useMutation(api.bookings.joinBooking);
 	const leaveTeam = useMutation(api.bookings.leaveBooking);
+	const joinWaitingList = useMutation(
+		api.waitinglist.enterWaitingList
+	);
+	const leaveWaitingList = useMutation(
+		api.waitinglist.leaveWaitingList
+	);
 
 	const isHost = host?._id === currUser?._id;
 
@@ -82,7 +96,7 @@ export default function BookingDetailsPage({ params }: Props) {
 				toast({
 					duration: 4000,
 					variant: 'default',
-					title: `Swtiched to ${side} team`,
+					title: `Switched to ${side} team`,
 					description: (
 						<div className='flex flex-col gap-3 w-full'>
 							<div className='flex flex-col gap-1'>
@@ -124,6 +138,7 @@ export default function BookingDetailsPage({ params }: Props) {
 				break;
 		}
 	}
+
 	async function handleLeaveTeam(
 		booking_id: Id<'bookings'>,
 		side: 'home' | 'away',
@@ -182,59 +197,36 @@ export default function BookingDetailsPage({ params }: Props) {
 				break;
 		}
 	}
-	async function handleCancelBooking(
-		booking_id?: string,
-		user_id?: string
-	) {
-		if (!booking_id || !user_id) return;
-		const response = await cancelBooking(booking_id, user_id);
 
-		switch (response.status) {
-			case STATUS_CODES.OK:
-				toast({
-					duration: 4000,
-					variant: 'default',
-					title: `Booking Cancellation`,
-					description: (
-						<div className='flex flex-col gap-3 w-full'>
-							<div className='flex flex-col gap-1'>
-								<span>{response.message}</span>
-							</div>
-						</div>
-					),
-				});
-				break;
-			case STATUS_CODES.UNAUTHORIZED:
-				toast({
-					duration: 4000,
-					variant: 'destructive',
-					title: `Whoops..`,
-					description: (
-						<div className='flex flex-col gap-3 w-full'>
-							<div className='flex flex-col gap-1'>
-								<span>{response.message}</span>
-							</div>
-						</div>
-					),
-				});
-				break;
+	async function handleJoinWaitingList() {
+		setIsWaitingListPending(true);
+		try {
+			const response = await joinWaitingList({
+				booking_id: booking!._id,
+				user_id: currUser!._id,
+			});
+			// Handle response and show toast
+		} catch (error) {
+			console.error(error);
+			// Show error toast
+		} finally {
+			setIsWaitingListPending(false);
+		}
+	}
 
-			case STATUS_CODES.INTERNAL_SERVER_ERROR:
-				toast({
-					duration: 4000,
-					variant: 'destructive',
-					title: `Whoops..`,
-					description: (
-						<div className='flex flex-col gap-3 w-full'>
-							<div className='flex flex-col gap-1'>
-								<span>{response.message}</span>
-							</div>
-						</div>
-					),
-				});
-				break;
-			default:
-				break;
+	async function handleLeaveWaitingList() {
+		setIsWaitingListPending(true);
+		try {
+			const response = await leaveWaitingList({
+				booking_id: booking!._id,
+				user_id: currUser!._id,
+			});
+			// Handle response and show toast
+		} catch (error) {
+			console.error(error);
+			// Show error toast
+		} finally {
+			setIsWaitingListPending(false);
 		}
 	}
 
@@ -317,15 +309,6 @@ export default function BookingDetailsPage({ params }: Props) {
 										</div>
 									</div>
 									{isHost && booking.status === 'Available' && (
-										// <Button
-										// 	disabled={isBookingCancellationPending}
-										// 	className=''
-										// 	variant={'destructive'}
-										// 	onClick={cancelBookingAction}>
-										// 	{isBookingCancellationPending
-										// 		? '1 sec...'
-										// 		: 'Cancel Booking'}
-										// </Button>
 										<CancelBookingDialog
 											booking={{
 												date: new Date(
@@ -429,6 +412,24 @@ export default function BookingDetailsPage({ params }: Props) {
 						booking_status={booking.status}
 					/>
 				</div>
+			)}
+
+			{booking && waitingList?.data && (
+				<WaitingList
+					waitingList={waitingList?.data}
+					onJoinWaitingList={handleJoinWaitingList}
+					onLeaveWaitingList={handleLeaveWaitingList}
+					
+					isUserInWaitingList={
+						waitingList.data?.some(
+							(waitingEntry) =>
+								waitingEntry.user?._id === currUser?._id
+						) || false
+					}
+					isDisabled={
+						isWaitingListPending || booking.status !== 'Available'
+					}
+				/>
 			)}
 		</div>
 	);

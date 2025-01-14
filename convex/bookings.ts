@@ -408,14 +408,15 @@ export const joinBooking = mutation({
 			booking.booking_start,
 			Date.now()
 		);
-		if (minUntilBookingStarts < JOIN_CUTOFF_MINUTES) {
-			return {
-				message:
-					'You cannot join or switch teams when the game is about to start',
-				data: null,
-				status: STATUS_CODES.CONFLICT,
-			};
-		}
+		//TODO: Uncomment this
+		// if (minUntilBookingStarts < JOIN_CUTOFF_MINUTES) {
+		// 	return {
+		// 		message:
+		// 			'You cannot join or switch teams when the game is about to start',
+		// 		data: null,
+		// 		status: STATUS_CODES.CONFLICT,
+		// 	};
+		// }
 		if (
 			booking.status === 'Cancelled' ||
 			booking.status === 'Completed'
@@ -549,6 +550,10 @@ export const leaveBooking = mutation({
 				}
 			}
 			await ctx.db.patch(booking_id, updatedBooking);
+			const response = await ctx.runMutation(
+				internal.waitinglist.EnterNextPlayerFromWaitingList,
+				{ user_id, booking_id }
+			);
 			return {
 				message: `You have left ${side}`,
 				data: updatedBooking,

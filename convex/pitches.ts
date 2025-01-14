@@ -75,3 +75,23 @@ export const getPitchById = query({
 		return pitch ? pitch : null;
 	},
 });
+
+// if the pitch does not exist, return a 404 status code
+export const getPitchByIdWith404 = query({
+	args: { id: v.id('pitches') },
+	handler: async (ctx, { id }) => {
+		const pitch = await ctx.db
+			.query('pitches')
+			.withIndex('by_id', (q) => q.eq('_id', id))
+			.first();
+		if (!pitch) {
+			return {
+				message: 'Pitch not found',
+				data: null,
+				status: STATUS_CODES.NOT_FOUND,
+			};
+		}
+		return pitch;
+	},
+});
+

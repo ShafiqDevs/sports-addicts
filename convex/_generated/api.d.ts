@@ -18,6 +18,7 @@ import type * as bookings from "../bookings.js";
 import type * as files from "../files.js";
 import type * as pitches from "../pitches.js";
 import type * as users from "../users.js";
+import type * as waitinglist from "../waitinglist.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -33,6 +34,7 @@ declare const fullApi: ApiFromModules<{
   files: typeof files;
   pitches: typeof pitches;
   users: typeof users;
+  waitinglist: typeof waitinglist;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,
